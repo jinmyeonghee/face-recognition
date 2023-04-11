@@ -1,6 +1,7 @@
 import cv2, mediapipe, os
 from .function.align import alignment_procedure
 from .function.url_to_image import url_to_np_array
+from .function.generals import find_target_size
 
 
 def get_eyes(detection, ih, iw):
@@ -22,7 +23,7 @@ class face_preparer:
     def __init__(self, min_detection_confidence = 0.2):
         self.detector = mediapipe.solutions.face_detection.FaceDetection(min_detection_confidence=min_detection_confidence)
 
-    def detect_faces(self, image):
+    def detect_faces(self, image, model_name='vggface'):
         """
         RGB이미지 형식의 np.ndarray로 받은 후 얼굴을 찾고, 얼굴 수만큼 크롭, 정렬, 패딩 추가,리사이즈해서
         리스트로 반환함
@@ -31,6 +32,8 @@ class face_preparer:
         
         results = self.detector.process(image)
         
+        target_size = find_target_size(model_name.lower())
+
         CAPR_face_list = [] # Cropped => Aligned => Padded => Resized  (CAPR)
         if results.detections:
             for idx, detection in enumerate(results.detections):
@@ -43,8 +46,8 @@ class face_preparer:
                 aligned_face = alignment_procedure(cropped_face, right_eye, left_eye)
                 padded_face = get_padded_face(aligned_face)
 
-                # 얼굴 이미지를 224x224로 리사이즈
-                resized_face = cv2.resize(padded_face, (224, 224))
+                # 얼굴 이미지를 target_size로 리사이즈
+                resized_face = cv2.resize(padded_face, target_size)
                 CAPR_face_list.append(resized_face)
 
         return CAPR_face_list

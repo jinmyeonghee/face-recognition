@@ -1,4 +1,4 @@
-import os
+import os, gdown
 from pathlib import Path
 import tensorflow as tf
 
@@ -83,16 +83,24 @@ def baseModel():
 
 
 def loadModel():
-
+    url="https://github.com/serengil/deepface_models/releases/download/v1.0/vgg_face_weights.h5"
     model = baseModel()
-
+    weights_dir_name = 'weights'
     # -----------------------------------
 
-    root_path = str(Path.cwd())
+    # root_path = str(Path.cwd())
     weight_file = "vgg_face_weights.h5"
-    model.load_weights(os.path.join(script_dir, 'weights', weight_file))
-    # print('loading weight from ' + root_path + '/models/basemodels/weights/' + weight_file)
 
+    weights_dir = os.path.join(script_dir, weights_dir_name)
+    if not os.path.exists(weights_dir):
+        os.makedirs(weights_dir)
+
+    file_path = os.path.join(script_dir, weights_dir, weight_file)
+    if os.path.isfile(file_path) != True:
+        print("vgg_face_weights.h5 will be downloaded...")
+        gdown.download(url, file_path, quiet=False)
+
+    model.load_weights(file_path)
     # -----------------------------------
 
     # TO-DO: why?

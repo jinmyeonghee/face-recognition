@@ -24,15 +24,16 @@ def find_target_size(model_name):
     """
 
     target_sizes = {
-        "VGG-Face": (224, 224),
-        "Facenet": (160, 160),
-        "Facenet512": (160, 160),
-        "OpenFace": (96, 96),
-        "DeepFace": (152, 152),
-        "DeepID": (55, 47),
-        "Dlib": (150, 150),
-        "ArcFace": (112, 112),
-        "SFace": (112, 112),
+        "VGGFace".lower(): (224, 224), # VGG-Face 동일모델
+        "VGG-Face".lower(): (224, 224), # VGG-Face 동일모델
+        "Facenet".lower(): (160, 160),
+        "Facenet512".lower(): (160, 160),
+        "OpenFace".lower(): (96, 96),
+        "DeepFace".lower(): (152, 152),
+        "DeepID".lower(): (55, 47),
+        "Dlib".lower(): (150, 150),
+        "ArcFace".lower(): (112, 112),
+        "SFace".lower(): (112, 112),
     }
 
     target_size = target_sizes.get(model_name)

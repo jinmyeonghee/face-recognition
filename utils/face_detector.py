@@ -18,7 +18,7 @@ def get_padded_face(aligned_face):
         padding = int((face_height - face_width) / 2)
         return cv2.copyMakeBorder(aligned_face, 0, 0, padding, padding, cv2.BORDER_CONSTANT, value=(0, 0, 0))
 
-class representer:
+class face_preparer:
     def __init__(self, min_detection_confidence = 0.2):
         self.detector = mediapipe.solutions.face_detection.FaceDetection(min_detection_confidence=min_detection_confidence)
 

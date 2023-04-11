@@ -36,7 +36,7 @@ def loadModel():
 
     root_path = str(Path.cwd())
     weight_file = "face_recognition_sface_2021dec.onnx"
-    file_name = root_path + '/models/basemodels/weights/' + weight_file
+    file_name = 'models/basemodels/weights/' +  weight_file
 
     model = SFaceModel(model_path=file_name)
     print('loading weight from ' + root_path + '/models/basemodels/weights/' + weight_file)

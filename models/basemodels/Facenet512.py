@@ -9,7 +9,7 @@ def loadModel():
     
     root_path = str(Path.cwd())
     weight_file = "facenet512_weights.h5"
-    model.load_weights(root_path + '/models/basemodels/weights/' + weight_file)
+    model.load_weights('models/basemodels/weights/' + weight_file)
     print('loading weight from ' + root_path + '/models/basemodels/weights/' + weight_file)
 
     return model

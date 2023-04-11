@@ -1,5 +1,4 @@
 import tensorflow as tf
-from tensorflow.keras.models import load_model
 from models.basemodels.VGGFace import loadModel as vgg_load_model
 from models.basemodels.Facenet512 import loadModel as facenet512_load_model
 from models.basemodels.SFace import loadModel as sface_load_model

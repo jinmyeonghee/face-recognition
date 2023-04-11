@@ -2,6 +2,9 @@ import os
 from pathlib import Path
 import tensorflow as tf
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+# print("The directory of the current script:", script_dir)
+
 # ---------------------------------------
 
 tf_version = int(tf.__version__.split(".", maxsplit=1)[0])
@@ -87,8 +90,8 @@ def loadModel():
 
     root_path = str(Path.cwd())
     weight_file = "vgg_face_weights.h5"
-    model.load_weights('models/basemodels/weights/' + weight_file)
-    print('loading weight from ' + root_path + '/models/basemodels/weights/' + weight_file)
+    model.load_weights(os.path.join(script_dir, 'weights', weight_file))
+    # print('loading weight from ' + root_path + '/models/basemodels/weights/' + weight_file)
 
     # -----------------------------------
 

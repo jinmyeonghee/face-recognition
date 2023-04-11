@@ -4,7 +4,7 @@ from pathlib import Path
 import cv2 as cv
 
 # pylint: disable=line-too-long, too-few-public-methods
-
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 class _Layer:
     input_shape = (None, 112, 112, 3)
@@ -35,10 +35,10 @@ class SFaceModel:
 def loadModel():
 
     root_path = str(Path.cwd())
-    weight_file = "face_recognition_sface_2021dec.onnx"
-    file_name = 'models/basemodels/weights/' +  weight_file
+    file_name = "face_recognition_sface_2021dec.onnx"
+    file_path = os.path.join(script_dir, 'weights', file_name)
 
-    model = SFaceModel(model_path=file_name)
-    print('loading weight from ' + root_path + '/models/basemodels/weights/' + weight_file)
+    model = SFaceModel(model_path=file_path)
+    # print('loading weight from ' + root_path + '/models/basemodels/weights/' + weight_file)
 
     return model

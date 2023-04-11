@@ -29,10 +29,10 @@ class verifier:
 
     
     def verify(self, origin_face_list, target_face_list):
-        print(origin_face_list)
-        print(len(origin_face_list))
-        print(target_face_list)
-        print(len(target_face_list))
+        # print(origin_face_list)
+        # print(len(origin_face_list))
+        # print(target_face_list)
+        # print(len(target_face_list))
         if len(origin_face_list) == 0:
             
             return {'result_message' : '원본 이미지에서 얼굴이 검출되지 않았습니다.', 'result_code' : -2 }

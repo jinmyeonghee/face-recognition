@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-from .function.call_onnx_model import load_onnx_model
+# from .function.call_onnx_model import load_onnx_model
 from .function.get_embedding import get_embedding
 from .function.get_similarity import get_distance
 
@@ -15,11 +15,12 @@ class verifier:
         self.model_name = model.capitalize()
         self.distance_metric = distance_metric
         if self.model_name == "VGG-FACE".capitalize() or model.capitalize() == "VGGFace".capitalize():
-            self.model = load_model('../models/checkpoints/vgg_face_weights.h5')
+            self.model = load_model('models/checkpoints/vgg_face_weights.h5')
         elif self.model_name == "Facenet512".capitalize():
-            self.model = load_model('../models/checkpoints/facenet512_weights.h5')
+            self.model = load_model('models/checkpoints/facenet512_weights.h5')
         elif self.model_name == "SFace".capitalize():
-            self.model = load_onnx_model('../models/checkpoints/face_recognition_sface_2021dec.onnx')
+            # self.model = load_onnx_model('models/checkpoints/face_recognition_sface_2021dec.onnx')
+            pass
 
     def verify_each(self, origin_face, target_face):
         origin_embedding = get_embedding(self.model, origin_face)

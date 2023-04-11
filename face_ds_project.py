@@ -42,6 +42,8 @@ class FaceDSProject:
     def verify(self, origin_image_path, target_image_path):
         """
         verify한 결과 반환
+        image_path : 이미지 url, 이미지 시스템 경로, 이미지 RGB np.ndarray 세 형식으로 받습니다.
+        원본 이미지 얼굴별로 타겟 이미지 얼굴들과 비교 결과를 dict의 리스트로 반환.
         """
         face_list1 = self.get_faces(origin_image_path)
         face_list2 = self.get_faces(target_image_path)

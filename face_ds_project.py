@@ -15,7 +15,7 @@ def is_numpy_image(array):
 
 class FaceDSProject:
     def __init__(self, min_detection_confidence = 0.2, model = 'VGG-Face', distance_metric = 'cosine'):
-        self.representer = representer(min_detection_confidence=0.2)
+        self.representer = representer(min_detection_confidence)
         self.verifier = verifier(model, distance_metric)
     
     def represent(self, image_path):

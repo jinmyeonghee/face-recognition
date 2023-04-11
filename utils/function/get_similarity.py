@@ -71,12 +71,12 @@ def get_distance(origin_embedding, target_embedding, model_name, distance_metric
             raise ValueError("Invalid distance metric")
         
         threshold = findThreshold(model_name, distance_metric)
-        print(threshold)
+        # print(threshold)
         if threshold > distance:
-            return (f"임계값: {threshold}, 두 얼굴의 유사도: {distance:.2f}", True)
+            return { "임계값": threshold, "두 얼굴의 유사도": round(distance, 2), "일치 여부" : True }
             #return True
         else:
-            return (f"임계값: {threshold}, 두 얼굴의 유사도: {distance:.2f}", False)
+            return { "임계값": threshold, "두 얼굴의 유사도": round(distance, 2), "일치 여부" : False }
             #return False
 
     else:

@@ -1,5 +1,3 @@
-import tensorflow as tf
-from tensorflow.keras.models import load_model
 from models.basemodels.VGGFace import loadModel as vgg_load_model
 from models.basemodels.Facenet512 import loadModel as facenet512_load_model
 from models.basemodels.SFace import loadModel as sface_load_model
@@ -8,19 +6,18 @@ from .function.get_embedding import get_embedding
 from .function.get_similarity import get_distance
 
 class verifier:
-    def __init__(self, model = 'VGG-Face', distance_metric = 'cosine'):
+    def __init__(self, model_name = 'VGG-Face', distance_metric = 'cosine'):
         """
         ### models = ["VGG-Face", "Facenet", "Facenet512", "OpenFace", "DeepFace", "DeepID", "ArcFace", "Dlib", "SFace"]
-        Verifier 안에서는 매개변수 model이 model_name Str변수가 되고, 실제 모델이 model 변수에 할당된다.
 
         """
-        self.model_name = model.capitalize()
+        self.model_name = model_name.lower()
         self.distance_metric = distance_metric
-        if self.model_name == "VGG-FACE".capitalize() or model.capitalize() == "VGGFace".capitalize():
+        if self.model_name == "VGG-FACE".lower() or model_name.lower() == "VGGFace".lower():
             self.model = vgg_load_model()
-        elif self.model_name == "Facenet512".capitalize():
+        elif self.model_name == "Facenet512".lower():
             self.model = facenet512_load_model()
-        elif self.model_name == "SFace".capitalize():
+        elif self.model_name == "SFace".lower():
             self.model = sface_load_model()
 
     def verify_each(self, origin_face, target_face):
@@ -31,10 +28,10 @@ class verifier:
 
     
     def verify(self, origin_face_list, target_face_list):
-        print(origin_face_list)
-        print(len(origin_face_list))
-        print(target_face_list)
-        print(len(target_face_list))
+        # print(origin_face_list)
+        # print(len(origin_face_list))
+        # print(target_face_list)
+        # print(len(target_face_list))
         if len(origin_face_list) == 0:
             
             return {'result_message' : '원본 이미지에서 얼굴이 검출되지 않았습니다.', 'result_code' : -2 }

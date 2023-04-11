@@ -1,9 +1,11 @@
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-# from .function.call_onnx_model import load_onnx_model
+from models.basemodels.VGGFace import loadModel as vgg_load_model
+from models.basemodels.Facenet512 import loadModel as facenet512_load_model
+from models.basemodels.SFace import loadModel as sface_load_model
+
 from .function.get_embedding import get_embedding
 from .function.get_similarity import get_distance
-
 
 class verifier:
     def __init__(self, model = 'VGG-Face', distance_metric = 'cosine'):
@@ -15,12 +17,11 @@ class verifier:
         self.model_name = model.capitalize()
         self.distance_metric = distance_metric
         if self.model_name == "VGG-FACE".capitalize() or model.capitalize() == "VGGFace".capitalize():
-            self.model = load_model('models/checkpoints/vgg_face_weights.h5')
+            self.model = vgg_load_model()
         elif self.model_name == "Facenet512".capitalize():
-            self.model = load_model('models/checkpoints/facenet512_weights.h5')
+            self.model = facenet512_load_model()
         elif self.model_name == "SFace".capitalize():
-            # self.model = load_onnx_model('models/checkpoints/face_recognition_sface_2021dec.onnx')
-            pass
+            self.model = sface_load_model()
 
     def verify_each(self, origin_face, target_face):
         origin_embedding = get_embedding(self.model, origin_face)
@@ -30,7 +31,12 @@ class verifier:
 
     
     def verify(self, origin_face_list, target_face_list):
+        print(origin_face_list)
+        print(len(origin_face_list))
+        print(target_face_list)
+        print(len(target_face_list))
         if len(origin_face_list) == 0:
+            
             return {'result_message' : '원본 이미지에서 얼굴이 검출되지 않았습니다.', 'result_code' : -2 }
         if len(target_face_list) == 0:
             return {'result_message' : '비교할 이미지에서 얼굴이 검출되지 않았습니다.', 'result_code' : -1 }
@@ -42,6 +48,7 @@ class verifier:
             for j, t_face in enumerate(target_face_list):
                 result = self.verify_each(o_face, t_face)
                 face_dict[f"{i+1}번째 얼굴"].append(result)
+            face_dict_list.append(face_dict)
         
         return face_dict_list
 

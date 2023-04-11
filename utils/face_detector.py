@@ -1,5 +1,6 @@
 import cv2, mediapipe
 from .function.align import alignment_procedure
+from .function.url_to_image import url_to_np_array
 
 def get_eyes(detection, ih, iw):
     landmarks = detection.location_data.relative_keypoints
@@ -26,7 +27,11 @@ class representer:
         리스트로 반환함
         예) 3인의 얼굴이 발견된 경우, [이미지numpy배열1, 이미지numpy배열2, 이미지numpy배열3]
         """
-        image = cv2.imread(image_path)
+        image = ''
+        if image_path.lower().startswith("http://") or image_path.lower().startswith("https://"):
+            image = url_to_np_array(image_path)
+        else:
+            image = cv2.imread(image_path)
         results = self.detector.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         CAPR_face_list = [] # Cropped => Aligned => Padded => Resized  (CAPR)
         for idx, detection in enumerate(results.detections):

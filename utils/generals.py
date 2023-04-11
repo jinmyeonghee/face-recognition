@@ -2,6 +2,10 @@ import tensorflow as tf
 import numpy as np
 import os
 import random
+from pathlib import Path
+from PIL import Image
+import cv2
+import requests
 
 
 def set_seeds(SEED=42):
@@ -11,6 +15,7 @@ def set_seeds(SEED=42):
   tf.random.set_seed(SEED)
   np.random.seed(SEED)
   random.seed(SEED)
+# --------------------------------------------------
 
 
 def find_target_size(model_name):
@@ -41,3 +46,35 @@ def find_target_size(model_name):
         raise ValueError(f"unimplemented model name - {model_name}")
 
     return target_size
+# --------------------------------------------------
+
+
+def load_image(img):
+    """Load image from path, url, numpy array.
+
+    Args:
+        img: a path, url, numpy array.
+
+    Raises:
+        ValueError: if the image path does not exist.
+
+    Returns:
+        numpy array: the loaded image.
+    """
+    # The image is already a numpy array
+    if type(img).__module__ == np.__name__:
+        return img
+
+    # The image is a url
+    if img.startswith("http"):
+        return np.array(Image.open(requests.get(img, stream=True, timeout=60).raw).convert("RGB"))[
+            :, :, ::-1
+        ]
+
+    # The image is a path
+    if os.path.isfile(img) is not True:
+        raise ValueError(f"Confirm that {img} exists")
+    return cv2.imread(img)
+# --------------------------------------------------
+
+

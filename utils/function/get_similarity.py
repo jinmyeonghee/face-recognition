@@ -4,6 +4,8 @@ similarity(유사도) : 두 벡터를 비교해 검증.
 가장 쉬운 벡터 비교 방법은 유클리디안 거리를 찾는 것 
 '''
 import numpy as np
+import math
+import tensorflow as tf
 
 # 코사인유사도
 # def cosine_similarity(source, test):
@@ -13,7 +15,6 @@ import numpy as np
 #     return cosine_similarity
 
 
-# cosine거리
 def cosine_distance(source, test):
     a = np.matmul(np.transpose(source), test)
     b = np.sum(np.multiply(source, source))
@@ -21,15 +22,26 @@ def cosine_distance(source, test):
     return 1 - (a / (np.sqrt(b) * np.sqrt(c)))
 
 
-# euclidean거리
 def euclidean_distance(source, test):
-    distance_vector = np.square(source - test)
-    return np.sqrt(distance_vector.sum())
-
+    # 각 차원의 차이의 제곱의 합을 루트한 값
+    euclidean_distance = source - test
+    euclidean_distance = np.sum(np.multiply(euclidean_distance, euclidean_distance))
+    euclidean_distance = np.sqrt(euclidean_distance)
+    return euclidean_distance
     
-# euclidean_l2
+
 def euclidean_l2_distance(source, test):
-    return np.sqrt(np.sum((source - test) ** 2))
+    # 벡터를 정규화한 후 차원 별로 제곱한 값들의 합을 구한 뒤 루트한 값
+    # L2 normalization
+    source = source / np.linalg.norm(source)
+    test = test / np.linalg.norm(test)
+    
+    # Compute L2 distance
+    euclidean_l2_distance = source - test
+    euclidean_l2_distance = np.sqrt(np.sum(np.square(euclidean_l2_distance)))
+
+    return euclidean_l2_distance
+
 
 
 def findThreshold(model_name, distance_metric):

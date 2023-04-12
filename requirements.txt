@@ -87,11 +87,10 @@ tensorboard==2.9.1
 tensorboard-data-server @ file:///C:/b/abs_2fhvpo862s/croot/tensorboard-data-server_1670853600144/work/tensorboard_data_server-0.6.1-py3-none-any.whl
 tensorboard-plugin-wit @ file:///C:/tf/b/tensorboard-plugin-wit_1660162132996/work/tensorboard_plugin_wit-1.8.1-py3-none-any.whl
 
-# tensorflow 2.10, 2.11은 호환 문제가 있고 2.12는 python 3.8부터 지원하며 일반 윈도우를 지원 안함.
-tensorflow==2.9.3
+# tensorflow 2.11은 호환 문제가 있고 2.12는 python 3.8부터 지원하며 일반 윈도우를 지원 안함.
+tensorflow==2.10.1
 tensorflow-addons==0.19.0
 tensorflow-estimator==2.9.0
-tensorflow-intel==2.11.0
 tensorflow-io-gcs-filesystem==0.31.0
 termcolor @ file:///C:/b/abs_16qe7jhw7n/croot/termcolor_1668084642458/work
 tornado @ file:///C:/ci/tornado_1662476933490/work

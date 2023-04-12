@@ -1,70 +1,141 @@
+import os
 import pandas as pd
-from keras.preprocessing.image import ImageDataGenerator
+from tqdm import tqdm
+from pathlib import Path
+from sklearn.model_selection import train_test_split
+from utils.generals import *
 
 
-def create_datasets(df_path, target_size=(224, 224), batch_size=32):
-    """데이터를 불러오고 모델에 맞는 형태로 변환해주는 함수
+
+def get_label_data(df_path):
+    """ 이미지 경로 - id - gender 컬럼을 가지는 데이터프레임을 가져온다
+    input: 
+        File_Path, ID, Gender 정보를 가지는 엑셀파일 경로
+    output: 
+        File_Path - ID - Gender 컬럼을 가지는 데이터프레임
     """
-    # 엑셀 파일에서 데이터프레임을 읽어오기
-    df = pd.read_excel(df_path)
-    
-    # 라벨을 숫자로 매핑 (기업데이터 해당)
-    label_map = {'0': 0, '2': 1, '남성': 0, '여성': 1} # 2:인증(동일인)
-    df['same_person'] = df['same_person'].apply(lambda x: label_map[x])
-    df['gender'] = df['gender'].apply(lambda x: label_map[x])
+    xlsx = pd.read_excel(df_path, sheet_name=None, engine="openpyxl")
+    df = pd.concat(xlsx.values()) # 모든 시트 합침
+    df.reset_index(drop=True, inplace=True) # 인덱스 재설정
 
-    """
-    # 긍정, 부정 쌍으로 이루어진 데이터셋으로 만들기
-    (pairImgTrain, pairidTrain, pairsexTrain) = create_pairs(X_train, y_train, y_train_2, train_all_img, train_all_id)
-    (pairImgTest, pairidTest, pairsexTest) = create_pairs(X_test, y_test, y_test_2, test_all_img, test_all_id)
-    print('finish --> create pairs ')
-    # 이미지 경로 -> np.array
-    """
-
-
-    
-    # Image Preprocessing
-    # ImageDataGenerator 객체 생성
-    datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
-
-    # train, validation dataset 생성
-    train_dataset = datagen.flow_from_dataframe(
-        dataframe=df,
-        directory=data_path,
-        x_col='Extracted_Path',  # column in 'dataframe' that contains the filenames
-        y_col=['same_person', 'gender'],
-        subset='training',  # ImageDataGenerator에서 validation_split을 설정하여 데이터 부분집합을 정의해준 것
-        target_size=target_size,
-        batch_size=batch_size,
-        shuffle=True,
-        class_mode='binary',  # 동일인 여부를 0과 1로 분류하므로 binary class mode
-        color_mode='rgb',  # rgb / grayscale
-        save_to_dir=None, # 증강된 이미지를 저장할 디렉토리
-        save_prefix='Aug_' # 저장된 이미지의 파일이름에 사용할 접두부호 (save_to_dir이 활성화 됐을 경우)
-    )
-
-    validation_dataset = datagen.flow_from_dataframe(
-        dataframe=df,
-        directory=data_path,
-        x_col='Extracted_Path',
-        y_col=['same_person', 'gender'],
-        subset='validation',
-        target_size=target_size,
-        batch_size=batch_size,
-        shuffle=False,
-        class_mode='binary',  # 성별을 0과 1로 분류하므로 binary class mode
-        color_mode='rgb',
-        save_to_dir=None, 
-        save_prefix='Aug_'
-    )
-    
-    return train_dataset, validation_dataset
+    return df
 # -----------------------------------
 
 
-data_path = '../DATA_AIHub/dataset/'
-data_path = '../../DATA_AIHub/dataset/'
+def img_transform(img_path_arr, img_base_path, target_size, batch_size=32):
+    """ batch_size 단위로 이미지 경로를 array로 읽어오고 target_size로 resize
+    input: 
+        img_path_arr : 이미지 경로들의 array
+        img_base_path : 이미지파일들이 저장되어 있는 상위 폴더 경로
+        target_size : 변환할 이미지 사이즈
+        batch_size : 한 번에 처리할 개수
+    output:
+        이미지를 (데이터수, target_size[0], target_size[1], 채널수) 형태의 np.ndarray로 반환
+    """
+    img_sets = []
+    for i in tqdm(range(0, len(img_path_arr), batch_size)):
+        batch_paths = img_path_arr[i:i+batch_size]
+        batch_imgs = []
+        for img_path in batch_paths:
+            img = cv2.imread(str(Path(os.path.join(img_base_path, img_path))))
+            img = cv2.resize(img, target_size)  # 이미지 크기를 target_size로 조정
+            batch_imgs.append(img)
+        img_sets.append(np.array(batch_imgs))
 
-train_data, val_data = create_datasets(data_path)
-print(type(train_data))
-print(train_data)
+    return np.vstack(img_sets)
+# -----------------------------------
+
+
+def create_pairs(img_arr, id_arr):
+    """ 동일인여부 예측을 위해 긍정/부정 이미지 쌍을 만들어주는 함수
+    input: 
+        이미지 array, id array를 입력
+    output: 
+        ((이미지, 이미지), 동일인여부 라벨)
+    """
+    pairImages = []  # (이미지, 이미지) 쌍
+    pairLabels = [] # 긍정(두 사진이 동일인):1, 부정(두 사진이 비동일인):0 레이블
+
+    # 모든 이미지에 대해 반복
+    for ix in range(len(img_arr)):
+        currentImage = img_arr[ix]
+        currentID = id_arr[ix]
+
+        try: # 현재 이미지와 같은 id를 갖는 이미지를 랜덤 선택
+            posIdxs = list(np.where(id_arr == currentID))[0] 
+            posIdx = random.choice(posIdxs) 
+            while (posIdx == ix)&(len(posIdxs)>2): # 같은 사진을 선택하면 다시 선택
+                posIdx = random.choice(posIdxs)
+            
+            # 긍정 쌍을 만들어 이미지와 레이블을 저장
+            pairImages.append([currentImage, img_arr[posIdx]])
+            pairLabels.append([1])
+            
+            
+            # 현재 이미지와 다른 id를 갖는 이미지를 랜덤 선택
+            negId = list(np.where(id_arr != currentID))
+            negIdx = random.choice(negId)
+            
+            # 부정 쌍을 만들어 이미지와 레이블을 저장
+            pairImages.append([currentImage, img_arr[negIdx]])
+            pairLabels.append([0])
+        
+        except:
+            continue
+    
+    return (np.array(pairImages), np.array(pairLabels))
+# -----------------------------------
+
+
+def create_datasets(df_path, img_path, target_size=(224, 224), batch_size=32):
+    """ 데이터를 불러오고 모델에 맞는 형태로 변환해주는 함수
+    input: 
+        df_path : File_Path, ID, Gender 정보를 가지는 엑셀파일 경로
+        img_path : 이미지파일들이 저장되어 있는 상위 폴더 경로
+    output: 
+        File_Path - ID - Gender 컬럼을 가지는 데이터프레임
+    """
+    img_base_path = img_path
+
+    # 라벨 및 이미지경로 엑셀(image_path-id-gender) 읽어오기
+    df = get_label_data(df_path) 
+
+    # # 라벨을 숫자로 매핑 (기업데이터 해당)
+    # label_map = {'0': 0, '2': 1, '남성': 0, '여성': 1} # 2:인증(동일인)
+    # df['labeled_result_value'] = df['labeled_result_value'].apply(lambda x: label_map[x])
+    # df['gender'] = df['gender'].apply(lambda x: label_map[x])
+
+    # train, test 데이터셋 split -> (1376640,) (344160,)
+    X_train, X_test, y_train, y_test = train_test_split( 
+        df['File_Path'], df['ID'], test_size=0.2, stratify=df['Gender'], random_state=42)
+    print("X_train, X_test, y_train, y_test shape: ", X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+
+    # pd.Series -> np.ndarray
+    if isinstance(X_train, pd.Series):
+        X_train, X_test, y_train, y_test = X_train.values, X_test.values, y_train.values, y_test.values
+
+    # 이미지 경로에서 array로 읽어오기 (메모리,시간 소요 큼)
+    print("Converting image path data -> image arrays ...")
+    X_train = img_transform(X_train, img_base_path, target_size, batch_size)
+    X_test = img_transform(X_train, img_base_path, target_size, batch_size)
+
+    # 긍정/부정 이미지쌍 만들기
+    print("Creating image pairs ...")
+    (pairImgTrain, pairIdTrain) = create_pairs(X_train, y_train)
+    (pairImgTest, pairIdTest) = create_pairs(X_test, y_test)
+
+    print('pairImgTrain Shape :', pairImgTrain.shape)
+    print('pairidTrain Shape :', pairIdTrain.shape)
+    print('pairImgTest Shape :', pairImgTest.shape)
+    print('pairidTest Shape :', pairIdTest.shape)
+
+    return (pairImgTrain, pairIdTrain), (pairImgTest, pairIdTest)
+# -----------------------------------
+
+
+# data_path = '../DATA_AIHub/dataset/'
+# data_path = '../../make_traindata/id-gender-img_path.xlsx'
+
+# train_data, val_data = create_datasets(data_path)
+# print(type(train_data))
+# print(train_data)

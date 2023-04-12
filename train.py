@@ -75,12 +75,11 @@ def load_model(model_name):
 
 
 def build_model(model):
-    """학습 모델 구성
-    x: 이미지 두 장, y: id, gender
-
-    Args: 기본 모델 이름
-    
-    Returns : 동일인 여부 및 성별 예측 모델
+    """학습 모델 구성, x: 이미지 두 장, y: id, gender
+    input: 
+        기본 모델 이름
+    output: 
+        동일인 여부 및 성별 예측 모델
     """
     target_size = find_target_size(model) # 모델에 맞는 이미지 사이즈
     
@@ -104,11 +103,13 @@ def build_model(model):
 # -----------------------------------
 
 
-def train(df_path, model="VGGFace", batch_size=32, epochs=5, optimizer='adam', lr=0.001):
+def train(df_path, img_path, model="VGGFace", batch_size=32, epochs=5, optimizer='adam', lr=0.001):
     """모델 학습 함수
-    Args:
+    input: 
         df_path : 학습시킬 이미지와 라벨 정보가 들어있는 엑셀파일 경로
         model : 가져올 모델 이름
+    output: 
+    
     """
 
     set_seeds() # 시드 고정
@@ -117,7 +118,7 @@ def train(df_path, model="VGGFace", batch_size=32, epochs=5, optimizer='adam', l
     save_path = os.path.join(ROOT, 'models', f'{model}-custom.hdf5') # 학습 가중치를 저장할 경로
 
     # train, validation datasets 생성
-    train_dataset, val_dataset = create_datasets(df_path, target_size, batch_size)
+    train_dataset, val_dataset = create_datasets(df_path, img_path, target_size, batch_size)
     # 학습할 모델 불러오기
     model = build_model(model) 
 

@@ -6,8 +6,9 @@ current_file_path = os.path.abspath(__file__)
 project_root = os.path.dirname(current_file_path)
 sys.path.append(project_root)
 
-from utils.face_detector import face_preparer
-from utils.face_verifier import verifier
+from utils.face_detector import FacePreparer
+from utils.face_verifier import Verifier
+from utils.gender_distinguisher import GenderDistinguisher
 from utils.image_loader import image_loader
 
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
@@ -18,8 +19,9 @@ def is_numpy_image(array):
 class FaceDSProject:
     def __init__(self, min_detection_confidence = 0.2, model_name = 'VGG-Face', distance_metric = 'cosine'):
         self.model_name = model_name
-        self.preparer = face_preparer(min_detection_confidence)
-        self.verifier = verifier(self.model_name, distance_metric)
+        self.preparer = FacePreparer(min_detection_confidence)
+        self.verifier = Verifier(self.model_name, distance_metric)
+        self.distinguisher = GenderDistinguisher()
     
     def get_faces(self, image_path):
         """
@@ -50,22 +52,28 @@ class FaceDSProject:
 
         return self.verifier.verify(face_list1, face_list2)
     
+    def distinguish(self, image_path):
+        face_list = self.get_faces(image_path)
+        return self.distinguisher.predict_gender(face_list)
+
+    
 if __name__ == '__main__':
     # min_detection_confidence => detecting 임계값(0 ~ 1)
     # model_name => vggface/vgg-face, facenet512, sface (모델은 대소문자 구분 없음)
     # distance_metric => cosine, euclidean, euclidean_l2
-    project = FaceDSProject(model_name='facenet512', distance_metric='euclidean')
+    project = FaceDSProject(model_name='vggface', distance_metric='euclidean')
 
     source1 = '../datasets/High_Resolution/19062421/S001/L1/E01/C6.jpg'
     source2 = '../datasets/High_Resolution/19062421/S001/L1/E01/C7.jpg'
+    source1 = '../datasets/_temp/base/201703240905286710_1.jpg'
     
     print('This is sample')
-    print(project.verify(source1, source2))
-
+    # print(project.verify(source1, source2))
+    print(project.distinguish(source1))
+    print(project.distinguish(source2))
 
     url1 = 'https://m.media-amazon.com/images/I/71ZMw9YqEJL._SL1500_.jpg'
-    # url1 = '../datasets/_temp/base/bts01.jpg'
     url2 = 'https://m.media-amazon.com/images/I/71bnIcDHk6L._SL1500_.jpg'
     # url2 = '../datasets/_temp/base/bts01.jpg'
     
-    print(project.verify(url1, url2))
+    # print(project.verify(url1, url2))

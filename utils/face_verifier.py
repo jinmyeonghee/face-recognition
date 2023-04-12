@@ -5,7 +5,7 @@ from models.basemodels.SFace import loadModel as sface_load_model
 from .function.get_embedding import get_embedding
 from .function.get_similarity import get_distance
 
-class verifier:
+class Verifier:
     def __init__(self, model_name = 'VGG-Face', distance_metric = 'cosine'):
         """
         ### models = ["VGG-Face", "Facenet", "Facenet512", "OpenFace", "DeepFace", "DeepID", "ArcFace", "Dlib", "SFace"]

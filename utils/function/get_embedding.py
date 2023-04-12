@@ -32,8 +32,15 @@ def load_image(image_path, target_size):
     img = np.array(img)  
     return img
 
-# 이미지의 임베딩 벡터를 계산하는 함수
-def get_embedding(model, face_image):
+# 이미지 경로로부터 임베딩 벡터를 계산하는 함수
+def get_embedding(image_path, model, target_size):
+    img = load_image(image_path, target_size)
+    embedding = fetch_embedding(model, img)
+    # print(embedding)
+    return embedding
+
+# 이미지 np.ndarray(RGB)로부터 임베딩 벡터를 계산하는 함수
+def fetch_embedding(model, face_image):
     embedding = model.predict(np.expand_dims(face_image, axis=0)).flatten()
     # print(embedding)
     return embedding

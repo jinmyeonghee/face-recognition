@@ -7,8 +7,8 @@ import tensorflow as tf
 from PIL import Image
 from pathlib import Path
 
-from get_embedding import *
-from get_similarity import *
+from .function.get_embedding import *
+from .function.get_similarity import *
 
 
 def pipeline(input_base_path):

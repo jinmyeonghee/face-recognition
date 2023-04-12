@@ -1,11 +1,11 @@
 import tensorflow as tf
-from .SFace import loadModel
+from .VGGFace import loadModel
 from utils.math import get_layer
 from utils.function.generals import find_target_size
 
 def loadSiameseModel(distance_metric='cosine'):
     # 입력 이미지의 크기 설정 (예: 224x224x3)
-    input_shape = find_target_size('SFace') + (3,) # (w, h, 3)
+    input_shape = find_target_size('VGGFace') + (3,) # (w, h, 3)
 
     # 샴 네트워크의 두 입력 이미지 정의
     input_img1 = tf.keras.layers.Input(shape=input_shape)

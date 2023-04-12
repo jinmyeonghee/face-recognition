@@ -51,11 +51,11 @@ def find_target_size(model_name):
 # --------------------------------------------------
 
 
-def load_image(img):
+def load_image(img, project_root):
     """Load image from path, url, numpy array.
 
     Args:
-        img: a path, url, numpy array.
+        img: a path, url, numpy array(RGB).
 
     Raises:
         ValueError: if the image path does not exist.
@@ -68,15 +68,25 @@ def load_image(img):
         return img
 
     # The image is a url
-    if img.startswith("http"):
+    if img.lower().startswith("http://") or img.lower().startswith("https://"):
         return np.array(Image.open(requests.get(img, stream=True, timeout=60).raw).convert("RGB"))[
             :, :, ::-1
         ]
-
+    
     # The image is a path
+    img = os.path.join(project_root, img)
+    
     if os.path.isfile(img) is not True:
         raise ValueError(f"Confirm that {img} exists")
-    return cv2.imread(img)
+    
+    img = cv2.imread(img)
+    if img is None:
+        img = imread_korean(img)
+    rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    return rgb_img
 # --------------------------------------------------
 
-
+def imread_korean(file_path):
+    img_array = np.fromfile(file_path, np.uint8)
+    img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+    return img

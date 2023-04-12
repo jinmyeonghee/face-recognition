@@ -9,7 +9,7 @@ sys.path.append(project_root)
 from utils.face_detector import FacePreparer
 from utils.face_verifier import Verifier
 from utils.gender_distinguisher import GenderDistinguisher
-from utils.image_loader import image_loader
+from utils.function.generals import load_image
 
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
@@ -28,13 +28,8 @@ class FaceDSProject:
         image_path : 이미지 url, 이미지 시스템 경로, 이미지 RGB np.ndarray 세 형식으로 받습니다.
         model 인풋사이즈에 맞게 전처리된 얼굴 이미지 numpy배열 리스트 추출 반환
         """
-        if isinstance(image_path, str) == True:
-            image = image_loader(image_path, project_root)
-        elif is_numpy_image(image_path) == True:
-            image = image_path
-        else:    
-            raise ValueError('이미지 경로가 올바른 url이나 시스템 경로를 의미하는 str가 아니거나, 이미지 np.ndarray가 아닙니다.')
-        
+        image = load_image(image_path, project_root)
+       
         # np.ndarray에 어떤식으로 들어가는지 확인용.
         # with open(f"image_array{idx}.txt", "w") as outfile:
         #     for row in image:

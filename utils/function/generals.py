@@ -42,7 +42,7 @@ def find_target_size(model_name):
         "SFace".lower(): (112, 112),
     }
 
-    target_size = target_sizes.get(model_name)
+    target_size = target_sizes.get(model_name.lower())
 
     if target_size == None:
         raise ValueError(f"unimplemented model name - {model_name}")

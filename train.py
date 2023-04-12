@@ -13,7 +13,7 @@ if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))  # add ROOT to PATH
 ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
-from utils.generals import set_seeds, find_target_size
+from utils.function.generals import set_seeds, find_target_size
 from utils.trainData import create_datasets
 from utils.math import distanceLayer
 from utils.math import get_contrastive_loss
@@ -103,7 +103,7 @@ def build_model(model):
 # -----------------------------------
 
 
-def train(df_path, img_path, model="VGGFace", batch_size=32, epochs=5, optimizer='adam', lr=0.001):
+def train(df_path, img_path, model="vggface", batch_size=32, epochs=5, optimizer='adam', lr=0.001):
     """모델 학습 함수
     input: 
         df_path : 학습시킬 이미지와 라벨 정보가 들어있는 엑셀파일 경로
@@ -111,7 +111,6 @@ def train(df_path, img_path, model="VGGFace", batch_size=32, epochs=5, optimizer
     output: 
     
     """
-
     set_seeds() # 시드 고정
     target_size = find_target_size(model) # 모델에 맞는 이미지 사이즈
     # save_path = Path.joinpath(Path.cwd(), Path("models"))
@@ -119,7 +118,7 @@ def train(df_path, img_path, model="VGGFace", batch_size=32, epochs=5, optimizer
 
     # train, validation datasets 생성
     train_dataset, val_dataset = create_datasets(df_path, img_path, target_size, batch_size)
-    # 학습할 모델 불러오기
+    # # 학습할 모델 불러오기
     model = build_model(model) 
 
     # 손실 함수, 평가 지표 정의
@@ -184,7 +183,12 @@ def train(df_path, img_path, model="VGGFace", batch_size=32, epochs=5, optimizer
 
 
 
+# data_path = '../make_traindata/id-gender-img_path.xlsx'
+# img_path = '../DATA_AIHub/dataset/'
 
+# train_dataset, val_dataset = train(data_path, img_path)
+# print(type(train_dataset))
+# print(train_dataset)
 
 
 

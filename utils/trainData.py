@@ -1,9 +1,12 @@
 import os
 import pandas as pd
+import numpy as np
+import cv2
+import random
 from tqdm import tqdm
 from pathlib import Path
 from sklearn.model_selection import train_test_split
-from utils.generals import *
+from utils.function.generals import *
 
 
 
@@ -28,9 +31,9 @@ def img_transform(img_path_arr, img_base_path, target_size, batch_size=32):
         img_path_arr : 이미지 경로들의 array
         img_base_path : 이미지파일들이 저장되어 있는 상위 폴더 경로
         target_size : 변환할 이미지 사이즈
-        batch_size : 한 번에 처리할 개수
+        batch_size : 한 번에 처리할 데이터 수
     output:
-        이미지를 (데이터수, target_size[0], target_size[1], 채널수) 형태의 np.ndarray로 반환
+        이미지를 (데이터 수, target_size[0], target_size[1], 채널수) 형태의 np.ndarray로 반환
     """
     img_sets = []
     for i in tqdm(range(0, len(img_path_arr), batch_size)):
@@ -99,6 +102,7 @@ def create_datasets(df_path, img_path, target_size=(224, 224), batch_size=32):
 
     # 라벨 및 이미지경로 엑셀(image_path-id-gender) 읽어오기
     df = get_label_data(df_path) 
+    df = df[:1000]
 
     # # 라벨을 숫자로 매핑 (기업데이터 해당)
     # label_map = {'0': 0, '2': 1, '남성': 0, '여성': 1} # 2:인증(동일인)
@@ -117,25 +121,26 @@ def create_datasets(df_path, img_path, target_size=(224, 224), batch_size=32):
     # 이미지 경로에서 array로 읽어오기 (메모리,시간 소요 큼)
     print("Converting image path data -> image arrays ...")
     X_train = img_transform(X_train, img_base_path, target_size, batch_size)
-    X_test = img_transform(X_train, img_base_path, target_size, batch_size)
+    X_test = img_transform(X_test, img_base_path, target_size, batch_size)
 
     # 긍정/부정 이미지쌍 만들기
     print("Creating image pairs ...")
-    (pairImgTrain, pairIdTrain) = create_pairs(X_train, y_train)
-    (pairImgTest, pairIdTest) = create_pairs(X_test, y_test)
+    (pairImgTrain, pairLabelTrain) = create_pairs(X_train, y_train)
+    (pairImgTest, pairLabelTest) = create_pairs(X_test, y_test)
 
     print('pairImgTrain Shape :', pairImgTrain.shape)
-    print('pairidTrain Shape :', pairIdTrain.shape)
+    print('pairLabelTrain Shape :', pairLabelTrain.shape)
     print('pairImgTest Shape :', pairImgTest.shape)
-    print('pairidTest Shape :', pairIdTest.shape)
+    print('pairLabelTest Shape :', pairLabelTest.shape)
 
-    return (pairImgTrain, pairIdTrain), (pairImgTest, pairIdTest)
+    return (pairImgTrain, pairLabelTrain), (pairImgTest, pairLabelTest)
 # -----------------------------------
 
 
 # data_path = '../DATA_AIHub/dataset/'
 # data_path = '../../make_traindata/id-gender-img_path.xlsx'
+# img_path = '../../DATA_AIHub/dataset/'
 
-# train_data, val_data = create_datasets(data_path)
-# print(type(train_data))
-# print(train_data)
+# train_dataset, val_dataset = create_datasets(data_path, img_path)
+# print(type(train_dataset))
+# print(train_dataset)

@@ -19,10 +19,9 @@ cryptography @ file:///C:/b/abs_8ecplyc3n2/croot/cryptography_1677533105000/work
 cycler==0.11.0
 debugpy @ file:///C:/ci/debugpy_1637091911212/work
 decorator @ file:///opt/conda/conda-bld/decorator_1643638310831/work
-# dlib==19.24.99
 entrypoints @ file:///C:/ci/entrypoints_1649926659561/work
 filelock==3.11.0
-flatbuffers==1.12
+flatbuffers==23.3.3
 flit_core @ file:///opt/conda/conda-bld/flit-core_1644941570762/work/source/flit_core
 fonttools==4.38.0
 frozenlist @ file:///C:/b/abs_2bb5uzghsi/croot/frozenlist_1670004511812/work
@@ -40,7 +39,7 @@ ipython @ file:///C:/Windows/TEMP/abs_45b5zb1l7q/croots/recipe/ipython_165952985
 jedi @ file:///C:/ci/jedi_1644297241925/work
 jupyter_client @ file:///C:/b/abs_d8fk_kz9zk/croot/jupyter_client_1676330195659/work
 jupyter_core @ file:///C:/b/abs_b8r5lb5eus/croot/jupyter_core_1668084445779/work
-keras==2.9.0
+keras==2.10.0
 Keras-Preprocessing @ file:///tmp/build/80754af9/keras-preprocessing_1612283640596/work
 kiwisolver==1.4.4
 libclang==16.0.0
@@ -57,6 +56,7 @@ nest-asyncio @ file:///C:/b/abs_3a_4jsjlqu/croot/nest-asyncio_1672387322800/work
 numpy @ file:///C:/ci/numpy_and_numpy_base_1653574840943/work
 oauthlib @ file:///C:/b/abs_2eoymqc2ow/croot/oauthlib_1665490906043/work
 opencv-contrib-python==4.7.0.72
+opencv-python==4.7.0.72
 opt-einsum @ file:///tmp/build/80754af9/opt_einsum_1621500238896/work
 packaging @ file:///C:/b/abs_cfsup8ur87/croot/packaging_1671697442297/work
 parso @ file:///opt/conda/conda-bld/parso_1641458642106/work
@@ -83,14 +83,12 @@ rsa @ file:///tmp/build/80754af9/rsa_1614366226499/work
 scipy @ file:///C:/ci/scipy_1661333074914/work
 six @ file:///tmp/build/80754af9/six_1644875935023/work
 soupsieve==2.4
-tensorboard==2.9.1
+tensorboard==2.10.1
 tensorboard-data-server @ file:///C:/b/abs_2fhvpo862s/croot/tensorboard-data-server_1670853600144/work/tensorboard_data_server-0.6.1-py3-none-any.whl
 tensorboard-plugin-wit @ file:///C:/tf/b/tensorboard-plugin-wit_1660162132996/work/tensorboard_plugin_wit-1.8.1-py3-none-any.whl
-
-# tensorflow 2.11은 호환 문제가 있고 2.12는 python 3.8부터 지원하며 일반 윈도우를 지원 안함.
 tensorflow==2.10.1
 tensorflow-addons==0.19.0
-tensorflow-estimator==2.9.0
+tensorflow-estimator==2.10.0
 tensorflow-io-gcs-filesystem==0.31.0
 termcolor @ file:///C:/b/abs_16qe7jhw7n/croot/termcolor_1668084642458/work
 tornado @ file:///C:/ci/tornado_1662476933490/work

@@ -3,6 +3,7 @@ import argparse
 import sys
 import os
 import pandas as pd
+import time
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
 
@@ -14,7 +15,8 @@ if str(ROOT) not in sys.path:
 ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 from utils.function.generals import set_seeds, find_target_size
-from utils.trainData import create_datasets
+from utils.trainData import get_label_data, create_datasets
+from utils.function.generals import load_image
 from utils.math import distanceLayer
 from utils.math import get_contrastive_loss
 from utils.plot import plot_history, pair_plot, cm_plot
@@ -108,22 +110,28 @@ def train(df_path, img_path, model="vggface", batch_size=32, epochs=5, optimizer
     input: 
         df_path : 학습시킬 이미지와 라벨 정보가 들어있는 엑셀파일 경로
         model : 가져올 모델 이름
+        batch_size : 작게 설정할수록 학습에 시간이 더 오래 걸리지만, 메모리는 더 적게 쓸 수 있음
     output: 
     
     """
     set_seeds() # 시드 고정
-    target_size = find_target_size(model) # 모델에 맞는 이미지 사이즈
     # save_path = Path.joinpath(Path.cwd(), Path("models"))
     save_path = os.path.join(ROOT, 'models', f'{model}-custom.hdf5') # 학습 가중치를 저장할 경로
 
-    # train, validation datasets 생성
-    train_dataset, val_dataset = create_datasets(df_path, img_path, target_size, batch_size)
-    # # 학습할 모델 불러오기
+    start = time.time()
+    # 학습셋 정보 (이미지경로 및 라벨(image_path-id-gender) 엑셀) 읽어오기
+    df = get_label_data(df_path, 10000)  # 테스트용으로 일부 data 추출 (2개시트 각각 읽어오므로 2배)
+    print("-> get_label_data time: ", time.time()-start)
+
+    start = time.time()
+    # 데이터 전처리 & train, validation datasets 생성
+    train_dataset, val_dataset = create_datasets(df, img_path, model, batch_size)
+    print("-> create_datasets time: ", time.time()-start)
+
+    # 학습할 모델 불러오기
     model = build_model(model) 
 
     # 손실 함수, 평가 지표 정의
-    # loss = {'verify_outputs': 'binary_crossentropy', 'gender_outputs': 'binary_crossentropy'} # 이진분류의 대표적 손실함수 / 기존기수는 binary와 contrastive 비교해 contrastive 를 이용
-    # metrics = {'output1': 'binary_accuracy', 'output2': 'binary_accuracy'}
     loss = [get_contrastive_loss(margin=1), "binary_crossentropy"] # contrastive / 이진분류의 대표적 손실함수 
     metrics = ["accuracy"]
     
@@ -179,16 +187,17 @@ def train(df_path, img_path, model="vggface", batch_size=32, epochs=5, optimizer
     model.load_weights(save_path)
     
     return history
+    # return train_dataset, val_dataset
 # -----------------------------------
 
 
 
-# data_path = '../make_traindata/id-gender-img_path.xlsx'
-# img_path = '../DATA_AIHub/dataset/'
+data_path = '../make_traindata/id-gender-img_path.xlsx'
+img_path = '../DATA_AIHub/dataset/'
 
-# train_dataset, val_dataset = train(data_path, img_path)
-# print(type(train_dataset))
-# print(train_dataset)
+train_dataset, val_dataset = train(data_path, img_path)
+print("train_dataset[0](Img), train_dataset[1](Label) shape:",train_dataset[0].shape, train_dataset[1].shape)
+print("val_dataset[0](Img), val_dataset[1](Label) shape:",val_dataset[0].shape, val_dataset[1].shape)
 
 
 

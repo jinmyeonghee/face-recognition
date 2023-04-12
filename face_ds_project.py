@@ -23,7 +23,7 @@ class FaceDSProject:
         self.verifier = Verifier(self.model_name, distance_metric)
         self.distinguisher = GenderDistinguisher()
     
-    def get_faces(self, image_path):
+    def get_faces(self, image_path, model_name='vggface'):
         """
         image_path : 이미지 url, 이미지 시스템 경로, 이미지 RGB np.ndarray 세 형식으로 받습니다.
         model 인풋사이즈에 맞게 전처리된 얼굴 이미지 numpy배열 리스트 추출 반환
@@ -39,7 +39,7 @@ class FaceDSProject:
         # with open(f"image_array{idx}.txt", "w") as outfile:
         #     for row in image:
         #         np.savetxt(outfile, row, fmt="%d", delimiter=",")
-        return self.preparer.detect_faces(image, self.model_name)
+        return self.preparer.detect_faces(image, model_name)
 
     def verify(self, origin_image_path, target_image_path):
         """
@@ -47,13 +47,13 @@ class FaceDSProject:
         image_path : 이미지 url, 이미지 시스템 경로, 이미지 RGB np.ndarray 세 형식으로 받습니다.
         원본 이미지 얼굴별로 타겟 이미지 얼굴들과 비교 결과를 dict의 리스트로 반환.
         """
-        face_list1 = self.get_faces(origin_image_path)
-        face_list2 = self.get_faces(target_image_path)
+        face_list1 = self.get_faces(origin_image_path, self.model_name)
+        face_list2 = self.get_faces(target_image_path, self.model_name)
 
         return self.verifier.verify(face_list1, face_list2)
     
     def distinguish(self, image_path):
-        face_list = self.get_faces(image_path)
+        face_list = self.get_faces(image_path, 'gender')
         return self.distinguisher.predict_gender(face_list)
 
     
@@ -65,15 +65,16 @@ if __name__ == '__main__':
 
     source1 = '../datasets/High_Resolution/19062421/S001/L1/E01/C6.jpg'
     source2 = '../datasets/High_Resolution/19062421/S001/L1/E01/C7.jpg'
-    source1 = '../datasets/_temp/base/201703240905286710_1.jpg'
+    source3 = '../datasets/_temp/base/201703240905286710_1.jpg'
     
     print('This is sample')
-    # print(project.verify(source1, source2))
+    print(project.verify(source1, source2))
     print(project.distinguish(source1))
     print(project.distinguish(source2))
+    print(project.distinguish(source3))
 
     url1 = 'https://m.media-amazon.com/images/I/71ZMw9YqEJL._SL1500_.jpg'
     url2 = 'https://m.media-amazon.com/images/I/71bnIcDHk6L._SL1500_.jpg'
     # url2 = '../datasets/_temp/base/bts01.jpg'
     
-    # print(project.verify(url1, url2))
+    print(project.verify(url1, url2))

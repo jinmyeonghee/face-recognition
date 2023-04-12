@@ -23,14 +23,26 @@ def cosine_distance(source, test):
 
 # euclidean거리
 def euclidean_distance(source, test):
-    distance_vector = np.square(source - test)
-    return np.sqrt(distance_vector.sum())
-
+    # 각 차원의 차이의 제곱의 합을 루트한 값
+    euclidean_distance = source - test
+    euclidean_distance = np.sum(np.multiply(euclidean_distance, euclidean_distance))
+    euclidean_distance = np.sqrt(euclidean_distance)
+    return euclidean_distance
     
-# euclidean_l2
+# euclidean-l2거리
 def euclidean_l2_distance(source, test):
-    return np.sqrt(np.sum((source - test) ** 2))
+    # 벡터를 정규화한 후 차원 별로 제곱한 값들의 합을 구한 뒤 루트한 값
+    # L2 normalization
+    source = source / np.linalg.norm(source)
+    test = test / np.linalg.norm(test)
+    
+    # Compute L2 distance
+    euclidean_l2_distance = source - test
+    euclidean_l2_distance = np.sqrt(np.sum(np.square(euclidean_l2_distance)))
 
+    return euclidean_l2_distance
+
+#--------
 
 def findThreshold(model_name, distance_metric):
     

@@ -29,6 +29,7 @@ def find_target_size(model_name):
     """
 
     target_sizes = {
+        "gender".lower(): (224, 224), # Gender 모델용
         "VGGFace".lower(): (224, 224), # VGG-Face 동일모델
         "VGG-Face".lower(): (224, 224), # VGG-Face 동일모델
         "Facenet".lower(): (160, 160),

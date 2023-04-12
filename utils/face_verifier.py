@@ -2,10 +2,10 @@ from models.basemodels.VGGFace import loadModel as vgg_load_model
 from models.basemodels.Facenet512 import loadModel as facenet512_load_model
 from models.basemodels.SFace import loadModel as sface_load_model
 
-from .function.get_embedding import get_embedding
-from .function.get_similarity import get_distance
+from .function.get_embedding import fetch_embedding
+from .function.get_similarity import calculate_distance
 
-class verifier:
+class Verifier:
     def __init__(self, model_name = 'VGG-Face', distance_metric = 'cosine'):
         """
         ### models = ["VGG-Face", "Facenet", "Facenet512", "OpenFace", "DeepFace", "DeepID", "ArcFace", "Dlib", "SFace"]
@@ -21,10 +21,10 @@ class verifier:
             self.model = sface_load_model()
 
     def verify_each(self, origin_face, target_face):
-        origin_embedding = get_embedding(self.model, origin_face)
-        target_embedding = get_embedding(self.model, target_face)
+        origin_embedding = fetch_embedding(self.model, origin_face)
+        target_embedding = fetch_embedding(self.model, target_face)
         # 최종적으로 self.distance_metric을 사용해 get_distance 값을 가져온다.
-        return get_distance(origin_embedding, target_embedding, self.model_name, self.distance_metric)
+        return calculate_distance(origin_embedding, target_embedding, self.model_name, self.distance_metric)
 
     
     def verify(self, origin_face_list, target_face_list):

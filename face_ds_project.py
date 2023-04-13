@@ -7,7 +7,7 @@ project_root = os.path.dirname(current_file_path)
 sys.path.append(project_root)
 
 from utils.face_detector import FacePreparer
-from utils.face_verifier import Verifier # 특징을 각각 추출하여 함수로 비교
+# from utils.face_verifier import Verifier # 특징을 각각 추출하여 함수로 비교
 from utils.face_verifier2 import Verifier2 # 이미지를 둘다 넣고 딥러닝 결과값으로 비교 결과 확인
 from utils.gender_distinguisher import GenderDistinguisher
 from utils.function.generals import load_image
@@ -56,7 +56,7 @@ class FaceDSProject:
     
 if __name__ == '__main__':
     # min_detection_confidence => detecting 임계값(0 ~ 1)
-    # model_name => vggface/vgg-face, facenet512, sface (모델은 대소문자 구분 없음)
+    # model_name => vggface/vgg-face, facenet512 (모델은 대소문자 구분 없음)
     # distance_metric => cosine, euclidean, euclidean_l2
     project = FaceDSProject(model_name='vggface', distance_metric='cosine')
 

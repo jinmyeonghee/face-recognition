@@ -23,15 +23,13 @@ class FacePreparer:
     def __init__(self, min_detection_confidence = 0.2):
         self.detector = mediapipe.solutions.face_detection.FaceDetection(min_detection_confidence=min_detection_confidence)
 
-    def detect_faces(self, image, model_name='vggface'):
+    def detect_faces(self, image, model_name='vggface', align=True):
         """
         RGB이미지 형식의 np.ndarray로 받은 후 얼굴을 찾고, 얼굴 수만큼 크롭, 정렬, 패딩 추가,리사이즈해서
         리스트로 반환함
         예) 3인의 얼굴이 발견된 경우, [이미지np.ndarray1, 이미지np.ndarray2, 이미지np.ndarray3]
         """
-        
-        results = self.detector.process(image)
-        
+        results = self.detector.process(image)  
         target_size = find_target_size(model_name.lower())
 
         CAPR_face_list = [] # Cropped => Aligned => Padded => Resized  (CAPR)
@@ -39,11 +37,16 @@ class FacePreparer:
             for idx, detection in enumerate(results.detections):
                 bboxC = detection.location_data.relative_bounding_box
                 ih, iw, _ = image.shape
+                # Crop
                 x, y, w, h = int(bboxC.xmin * iw), int(bboxC.ymin * ih), int(bboxC.width * iw), int(bboxC.height * ih)
                 cropped_face = image[y:y+h, x:x+w]
-
-                right_eye, left_eye = get_eyes(detection, ih, iw)
-                aligned_face = alignment_procedure(cropped_face, right_eye, left_eye)
+                # Align  
+                if align:
+                    right_eye, left_eye = get_eyes(detection, ih, iw)
+                    aligned_face = alignment_procedure(cropped_face, right_eye, left_eye)
+                else:
+                    aligned_face = cropped_face
+                # Padding     
                 padded_face = get_padded_face(aligned_face)
 
                 # 얼굴 이미지를 target_size로 리사이즈

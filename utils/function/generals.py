@@ -79,9 +79,10 @@ def load_image(img, project_root):
     if os.path.isfile(img) is not True:
         raise ValueError(f"Confirm that {img} exists")
     
+    img_path = img
     img = cv2.imread(img)
     if img is None:
-        img = imread_korean(img)
+        img = imread_korean(img_path)
     rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     return rgb_img
 # --------------------------------------------------

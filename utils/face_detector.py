@@ -36,6 +36,10 @@ class FacePreparer:
         if results.detections:
             for idx, detection in enumerate(results.detections):
                 bboxC = detection.location_data.relative_bounding_box
+                if bboxC.xmin < 0:
+                    bboxC.xmin = 0
+                if bboxC.ymin < 0:
+                    bboxC.ymin = 0
                 ih, iw, _ = image.shape
                 # Crop
                 x, y, w, h = int(bboxC.xmin * iw), int(bboxC.ymin * ih), int(bboxC.width * iw), int(bboxC.height * ih)

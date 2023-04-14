@@ -36,13 +36,9 @@ class FacePreparer:
         if results.detections:
             for idx, detection in enumerate(results.detections):
                 bboxC = detection.location_data.relative_bounding_box
-                if bboxC.xmin < 0:
-                    bboxC.xmin = 0
-                if bboxC.ymin < 0:
-                    bboxC.ymin = 0
                 ih, iw, _ = image.shape
                 # Crop
-                x, y, w, h = int(bboxC.xmin * iw), int(bboxC.ymin * ih), int(bboxC.width * iw), int(bboxC.height * ih)
+                x, y, w, h = int(max(bboxC.xmin * iw, 0)), int(max(bboxC.ymin * ih, 0)), int(bboxC.width * iw), int(bboxC.height * ih)  # 음수값이 나와 이미지 크기를 벗어나지 않도록 함
                 cropped_face = image[y:y+h, x:x+w]
                 # Align  
                 if align:

@@ -7,9 +7,10 @@ project_root = os.path.dirname(current_file_path)
 sys.path.append(project_root)
 
 from utils.face_detector import FacePreparer
-from utils.face_verifier import Verifier
+# from utils.face_verifier import Verifier # 특징을 각각 추출하여 함수로 비교
+from utils.face_verifier2 import Verifier2 # 이미지를 둘다 넣고 딥러닝 결과값으로 비교 결과 확인
 from utils.gender_distinguisher import GenderDistinguisher
-from utils.image_loader import image_loader
+from utils.function.generals import load_image
 
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
@@ -20,7 +21,8 @@ class FaceDSProject:
     def __init__(self, min_detection_confidence = 0.2, model_name = 'VGG-Face', distance_metric = 'cosine'):
         self.model_name = model_name
         self.preparer = FacePreparer(min_detection_confidence)
-        self.verifier = Verifier(self.model_name, distance_metric)
+        # self.verifier = Verifier(self.model_name, distance_metric)
+        self.verifier = Verifier2(self.model_name, distance_metric)
         self.distinguisher = GenderDistinguisher()
     
     def get_faces(self, image_path, model_name='vggface'):
@@ -28,13 +30,8 @@ class FaceDSProject:
         image_path : 이미지 url, 이미지 시스템 경로, 이미지 RGB np.ndarray 세 형식으로 받습니다.
         model 인풋사이즈에 맞게 전처리된 얼굴 이미지 numpy배열 리스트 추출 반환
         """
-        if isinstance(image_path, str) == True:
-            image = image_loader(image_path, project_root)
-        elif is_numpy_image(image_path) == True:
-            image = image_path
-        else:    
-            raise ValueError('이미지 경로가 올바른 url이나 시스템 경로를 의미하는 str가 아니거나, 이미지 np.ndarray가 아닙니다.')
-        
+        image = load_image(image_path, project_root)
+       
         # np.ndarray에 어떤식으로 들어가는지 확인용.
         # with open(f"image_array{idx}.txt", "w") as outfile:
         #     for row in image:
@@ -59,22 +56,22 @@ class FaceDSProject:
     
 if __name__ == '__main__':
     # min_detection_confidence => detecting 임계값(0 ~ 1)
-    # model_name => vggface/vgg-face, facenet512, sface (모델은 대소문자 구분 없음)
+    # model_name => vggface/vgg-face, facenet512 (모델은 대소문자 구분 없음)
     # distance_metric => cosine, euclidean, euclidean_l2
-    project = FaceDSProject(model_name='vggface', distance_metric='euclidean')
+    project = FaceDSProject(model_name='vggface', distance_metric='cosine')
 
     source1 = '../datasets/High_Resolution/19062421/S001/L1/E01/C6.jpg'
     source2 = '../datasets/High_Resolution/19062421/S001/L1/E01/C7.jpg'
     source3 = '../datasets/_temp/base/201703240905286710_1.jpg'
     
     print('This is sample')
-    print(project.verify(source1, source2))
-    print(project.distinguish(source1))
-    print(project.distinguish(source2))
-    print(project.distinguish(source3))
+    print(project.verify(source1, source1))
+    # print(project.distinguish(source1))
+    # print(project.distinguish(source2))
+    # print(project.distinguish(source3))
 
     url1 = 'https://m.media-amazon.com/images/I/71ZMw9YqEJL._SL1500_.jpg'
     url2 = 'https://m.media-amazon.com/images/I/71bnIcDHk6L._SL1500_.jpg'
     # url2 = '../datasets/_temp/base/bts01.jpg'
     
-    print(project.verify(url1, url2))
+    print(project.verify(url1, url1))

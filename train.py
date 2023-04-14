@@ -114,9 +114,12 @@ def train(df_path, img_path, model="vggface", distance_metric='cosine', batch_si
     # save_path = Path.joinpath(Path.cwd(), Path("models"))
     save_path = os.path.join(ROOT, 'models', f'{model}-custom.hdf5') # 학습 가중치를 저장할 경로
 
+
+    # Dataset 준비 -----------------
+
     start = time.time()
     # 학습셋 정보 (이미지경로 및 라벨(image_path-id-gender) 엑셀) 읽어오기
-    df = get_label_data(df_path,100)  # 테스트용으로 일부 data 추출 (2개시트 각각 읽어오므로 2배)
+    df = get_label_data(df_path,10000)  # 테스트용으로 일부 data 추출 (2개시트 각각 읽어오므로 2배)
     print("-> get_label_data time: ", time.time()-start)
 
     # train, test 데이터셋 split  -> (1376640,) (344160,)
@@ -138,8 +141,8 @@ def train(df_path, img_path, model="vggface", distance_metric='cosine', batch_si
     start = time.time()
     # 긍정/부정 이미지쌍 만들기
     print("Creating image pairs ...")
-    (pairImgTrain, pairLabelTrain) = create_pairs(X_train, y_train)
-    (pairImgTest, pairLabelTest) = create_pairs(X_test, y_test)
+    pairImgTrain, pairLabelTrain = create_pairs(X_train, y_train, batch_size=batch_size, shuffle=True)
+    pairImgTest, pairLabelTest = create_pairs(X_test, y_test, batch_size=batch_size, shuffle=False)
 
     print('pairImgTrain Shape :', pairImgTrain.shape)
     print('pairLabelTrain Shape :', pairLabelTrain.shape)
@@ -147,55 +150,66 @@ def train(df_path, img_path, model="vggface", distance_metric='cosine', batch_si
     print('pairLabelTest Shape :', pairLabelTest.shape)
     print("-> create_pairs time: ", time.time()-start)
 
-    train_dataset, val_dataset = (pairImgTrain, pairLabelTrain), (pairImgTest, pairLabelTest)
 
+    # 모델 준비 -----------------
 
-    # # 학습할 모델 불러오기
+    # 학습할 모델 불러오기
     # model = build_model(model, distance_metric) 
+    model = load_model('VGG-Face') # 테스트
 
-    # # 손실 함수, 평가 지표 정의
-    # loss = [get_contrastive_loss(margin=1), "binary_crossentropy"] # contrastive / 이진분류의 대표적 손실함수 
-    # metrics = ["accuracy"]
+    # 손실 함수, 평가 지표 정의
+    loss = [get_contrastive_loss(margin=1), "binary_crossentropy"] # contrastive / 이진분류의 대표적 손실함수 
+    metrics = ["accuracy"]
     
-    # # optimizer 정의
-    # if optimizer == 'ADAGRAD':
-    #     opt = tf.keras.optimizers.Adagrad(learning_rate=lr)
-    # elif optimizer == 'ADADELTA':
-    #     opt = tf.keras.optimizers.Adadelta(learning_rate=lr, rho=0.9, epsilon=1e-6)
-    # elif optimizer == 'ADAM':
-    #     opt = tf.keras.optimizers.Adam(learning_rate=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-7)
-    # elif optimizer == 'RMSPROP':
-    #     opt = tf.keras.optimizers.RMSprop(learning_rate=lr, rho=0.9, momentum=0.9, epsilon=1.0)
-    # elif optimizer == 'MOM':
-    #     opt = tf.keras.optimizers.SGD(learning_rate=lr, momentum=0.9, nesterov=True)
-    # else:
-    #     raise ValueError('Invalid optimization algorithm')
+    # optimizer 정의
+    if optimizer.upper() == 'ADAGRAD':
+        opt = tf.keras.optimizers.Adagrad(learning_rate=lr)
+    elif optimizer.upper() == 'ADADELTA':
+        opt = tf.keras.optimizers.Adadelta(learning_rate=lr, rho=0.9, epsilon=1e-6)
+    elif optimizer.upper() == 'ADAM':
+        opt = tf.keras.optimizers.Adam(learning_rate=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-7)
+    elif optimizer.upper() == 'RMSPROP':
+        opt = tf.keras.optimizers.RMSprop(learning_rate=lr, rho=0.9, momentum=0.9, epsilon=1.0)
+    elif optimizer.upper() == 'MOM':
+        opt = tf.keras.optimizers.SGD(learning_rate=lr, momentum=0.9, nesterov=True)
+    else:
+        raise ValueError('Invalid optimization algorithm')
     
-    # # 모델 컴파일
-    # model.compile(optimizer=opt, loss=loss, metrics=metrics)
+    # 모델 컴파일
+    model.compile(optimizer=opt, loss=loss, metrics=metrics)
 
-    # # callback 정의 - early stopping, model checkpointing
-    # early_stopping_callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', 
-    #                                                             verbose=1,  # 콜백 메세지(0:출력X or 1:출력)
-    #                                                             patience=3)
-    # checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=save_path, 
-    #                                                             verbose=1,  
-    #                                                             save_best_only=True, 
-    #                                                             save_weights_only=True)
+    # callback 정의 - early stopping, model checkpointing
+    early_stopping_callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', 
+                                                                verbose=1,  # 콜백 메세지(0:출력X or 1:출력)
+                                                                patience=3)
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=save_path, 
+                                                                verbose=1,  
+                                                                save_best_only=True, 
+                                                                save_weights_only=True)
     
-    # # 모델 학습
-    # print('---------- fit model ----------')
+    # 모델 학습
+    print('---------- fit model ----------')
     # history = model.fit(
-    #     train_dataset,
+    #     [pairImgTrain[i][0] for i in range(len(pairImgTrain))],
+    #     [pairImgTrain[i][1] for i in range(len(pairImgTrain))],
+    #     pairLabelTrain,
     #     epochs=epochs,
-    #     validation_data=val_dataset,
+    #     validation_data=([pairImgTest[i][0] for i in range(len(pairImgTest))],
+    #                      [pairImgTest[i][1] for i in range(len(pairImgTest))],
+    #                      pairLabelTest),
+    #     callbacks=[early_stopping_callback, checkpoint_callback],
+    # )
+    # history = model.fit(
+    #     [pairImgTrain[:,0], pairImgTrain[:,1]], pairLabelTrain,
+    #     epochs=epochs,
+    #     validation_data=([pairImgTest[:,0], pairImgTest[:,1]], pairLabelTest),
     #     callbacks=[early_stopping_callback, checkpoint_callback]
     # )
 
     # # 모델 평가 (나중에 main 함수 짜고 정리필요)
     # plot_history(history)
     # print('---------- evaluate model ----------')
-    # results = model.evaluate(val_dataset)
+    # results = model.evaluate([pairImgTest[:,0], pairImgTest[:,1]], pairLabelTest)
     # # # 예측
     # # print('---------- predict test set ----------')
     # # predictions = model.predict([pairImgTest[:, 0], pairImgTest[:, 1]])
@@ -209,7 +223,7 @@ def train(df_path, img_path, model="vggface", distance_metric='cosine', batch_si
     # model.load_weights(save_path)
     
     # return history
-    return train_dataset, val_dataset
+    return (pairImgTrain, pairLabelTrain), (pairImgTest, pairLabelTest)
 # -----------------------------------
 
 
@@ -221,6 +235,7 @@ train_dataset, val_dataset = train(data_path, img_path)
 print("train_dataset[0](Img), train_dataset[1](Label) shape:",train_dataset[0].shape, train_dataset[1].shape)
 print("val_dataset[0](Img), val_dataset[1](Label) shape:",val_dataset[0].shape, val_dataset[1].shape)
 
+# print(train(data_path, img_path))
 
 
 

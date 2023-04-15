@@ -169,7 +169,7 @@ def train(df_path, img_path, model="vggface", distance_metric='cosine', batch_si
     elif optimizer.upper() == 'ADAM':
         opt = tf.keras.optimizers.Adam(learning_rate=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-7)
     elif optimizer.upper() == 'RMSPROP':
-        opt = tf.keras.optimizers.RMSprop(learning_rate=lr, rho=0.9, momentum=0.9, epsilon=1.0)
+        opt = tf.keras.optimizers.RMSprop(learning_rate=lr, rho=0.9, momentum=0.9, epsilon=1e-6)
     elif optimizer.upper() == 'MOM':
         opt = tf.keras.optimizers.SGD(learning_rate=lr, momentum=0.9, nesterov=True)
     else:

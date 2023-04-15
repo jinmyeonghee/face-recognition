@@ -22,7 +22,7 @@ class FaceDSProject:
         self.model_name = model_name
         self.preparer = FacePreparer(min_detection_confidence)
         # self.verifier = Verifier(self.model_name, distance_metric)
-        self.verifier = Verifier2(self.model_name, distance_metric)
+        self.verifier = Verifier2(self.model_name, distance_metric) #cosine, euclidean, euclidean_l2
         self.distinguisher = GenderDistinguisher()
     
     def get_faces(self, image_path, model_name='vggface'):

@@ -1,6 +1,7 @@
 from models.basemodels.CS_AI16_VGGFace import loadSiameseModel as vgg_load_siamese_model
 from models.basemodels.CS_AI16_Facenet512 import loadSiameseModel as facenet512_load_siamese_model
 from models.basemodels.CS_AI16_SFace import loadSiameseModel as sface_load_siamese_model
+from models.basemodels.CS_AI16_ArcFace import loadSiameseModel as arcface_load_siamese_model
 import tensorflow as tf
 
 
@@ -20,6 +21,9 @@ class Verifier2:
             
         elif self.model_name == "SFace".lower():
             self.model = sface_load_siamese_model(distance_metric)
+        
+        elif self.model_name == "ArcFace".lower():
+            self.model = arcface_load_siamese_model(distance_metric)
 
     def verify_each(self, origin_face, target_face):
         origin_face_batch = tf.expand_dims(origin_face / 255, axis=0)

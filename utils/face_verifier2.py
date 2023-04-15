@@ -26,8 +26,8 @@ class Verifier2:
             self.model = sface_load_siamese_model(distance_metric)
 
     def verify_each(self, origin_face, target_face):
-        origin_face_batch = tf.expand_dims(origin_face, axis=0)
-        target_face_batch = tf.expand_dims(target_face, axis=0)
+        origin_face_batch = tf.expand_dims(origin_face / 255, axis=0)
+        target_face_batch = tf.expand_dims(target_face / 255, axis=0)
         return self.model.predict([origin_face_batch, target_face_batch])
 
 

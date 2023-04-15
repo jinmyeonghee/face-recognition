@@ -13,15 +13,11 @@ class Verifier2:
         self.model_name = model_name.lower()
         self.distance_metric = distance_metric
         if self.model_name == "VGG-FACE".lower() or model_name.lower() == "VGGFace".lower():
-            # 모델 전체를 불러올 경우
-            # self.model = tf.keras.models.load_model()
-            # vgg_load_siamese_model()은 건너뜀.
             self.model = vgg_load_siamese_model(distance_metric)
-            # 가중치만 불러올 경우
-            # if weights_path에 가중치 파일이 있을 때:
-            #    self.model.load_weights(weights_path)
+
         elif self.model_name == "Facenet512".lower():
             self.model = facenet512_load_siamese_model(distance_metric)
+            
         elif self.model_name == "SFace".lower():
             self.model = sface_load_siamese_model(distance_metric)
 

@@ -1,6 +1,5 @@
 import cv2, mediapipe, os
 from .function.align import alignment_procedure
-from .function.url_to_image import url_to_np_array
 from .function.generals import find_target_size
 
 

@@ -1,7 +1,10 @@
 import tensorflow as tf
+import os
 from .VGGFace import loadModel
 from utils.math import get_layer
 from utils.function.generals import find_target_size
+
+script_path = os.path.abspath(__file__)
 
 def loadSiameseModel(distance_metric='cosine'):
     # 입력 이미지의 크기 설정 (예: 224x224x3)
@@ -26,4 +29,14 @@ def loadSiameseModel(distance_metric='cosine'):
     # 최종 샴 네트워크 모델 정의
     siamese_network = tf.keras.Model(inputs=[input_img1, input_img2], outputs=similarity_output)
 
+    loadWeight(siamese_network, distance_metric)
+
     return siamese_network
+    
+def loadWeight(siamese_network, distance_metric='cosine'):
+    WEIGHTS_FILE_NAME = 'vgg_siamese.h5'
+    
+    file_path = os.path.join(script_path, 'weights', WEIGHTS_FILE_NAME)
+    
+    if os.path.exists(file_path): # 나중엔 이부분에 가중치 다운로드를 집어넣고 무조건 가중치를 로드할 듯.
+        siamese_network.load_weights(file_path)

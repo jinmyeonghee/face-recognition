@@ -49,21 +49,21 @@ def img_transform(img_path_arr, img_base_path, model, batch_size=32):
             img = cv2.imread(str(Path(os.path.join(img_base_path, img_path))))
             faces = preparer.detect_faces(img, model, align=False)  # 얼굴 탐지, 크롭, 패딩, 리사이즈
             if len(faces) > 0: 
-                img = faces[0] # 이미지 리스트에서 감지된 얼굴 하나 선택
+                img = faces[0]/255.0 # 이미지 리스트에서 감지된 얼굴 하나 선택 & 정규화
             else:
-                img = np.zeros((target_size[0], target_size[1], 3), dtype=np.uint8)  # 검출되지 않은 경우, 빈 이미지 생성
+                img = "None"
                 # print("얼굴이 검출되지 않았습니다 -> ", img_path)
             batch_imgs.append(img)
-        img_sets.append(np.array(batch_imgs))
+        img_sets.extend(np.array(batch_imgs))
 
-    return np.vstack(img_sets)
+    return img_sets
 # -----------------------------------
 
 
 def create_pairs(X, y, batch_size=32, shuffle=True): #클래스에 대해 반복
     """ 동일인여부 예측을 위해 긍정/부정 이미지 쌍을 만들어주는 함수
     input: 
-        이미지 array, id array를 입력
+        이미지 list, id array를 입력
     output: 
         ((이미지, 이미지), 동일인여부 라벨)
     """
@@ -77,18 +77,31 @@ def create_pairs(X, y, batch_size=32, shuffle=True): #클래스에 대해 반복
         neg_indices = np.where(y != label)[0]
         n_samples = len(pos_indices) if len(pos_indices)<len(neg_indices) else len(neg_indices)
         for i in range(n_samples//2):
-            # 동일 id들의 인덱스들에서 반복 (긍정쌍 생성)
-            img_idx_1 = pos_indices[i*2]  # 짝수번째의 인덱스
-            img_idx_2 = pos_indices[i*2+1]  # 홀수번째의 인덱스
+            img_idx_1 = pos_indices[i*2]  # 긍정 짝수번째의 인덱스
+            img_idx_2 = pos_indices[i*2+1]  # 긍정 홀수번째의 인덱스
+            img_idx_3 = neg_indices[i*2] # 부정 인덱스
+            if isinstance(X[img_idx_1], str) or isinstance(X[img_idx_2], str) or isinstance(X[img_idx_3], str): 
+                print("img pair skip - ", y[img_idx_1], isinstance(X[img_idx_1], str),", ", y[img_idx_2], isinstance(X[img_idx_2], str),", ", y[img_idx_3], isinstance(X[img_idx_3], str))
+                continue # 얼굴이 검출되지 않은 경우 다음으로 (=사진 제외)
+            # 동일 id들의 인덱스들에서 긍정쌍 생성
             pairImages.append([X[img_idx_1], X[img_idx_2]])
             pairLabels.append(1)
-            # 다른 id들의 인덱스와 반복 (부정쌍 생성)
-            img_idx_2 = neg_indices[i*2]
+            # 다른 id들의 인덱스와 부정쌍 생성
             pairImages.append([X[img_idx_1], X[img_idx_2]])
             pairLabels.append(0)
     
-    pairImages = np.array(pairImages, dtype=np.uint8) # 여기서 메모리 문제
     pairLabels = np.array(pairLabels, dtype=np.uint8)
+    pairImages = np.array(pairImages, dtype=np.uint8) # 여기서 메모리 문제
+
+    ########
+    # num_pairs = len(pairImages)
+    # # 리스트를 배치 단위로 분할하여 array로 변환 후 합치기
+    # pairImages_list = [pairImages[i:i+batch_size] for i in range(0, num_pairs, batch_size)]
+    # pairLabels_list = [pairLabels[i:i+batch_size] for i in range(0, num_pairs, batch_size)]
+
+    # pairImages = np.concatenate([np.array(batch, dtype=np.uint8) for batch in pairImages_list])
+    # pairLabels = np.concatenate([np.array(batch, dtype=np.uint8) for batch in pairLabels_list])
+    ########
 
     if shuffle:
         indices = np.arange(len(pairLabels))

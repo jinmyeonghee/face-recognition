@@ -3,6 +3,7 @@ import os
 from .VGGFace import loadModel
 from utils.math import get_layer
 from utils.function.generals import find_target_size
+from .function.network_maker import get_transformed_base_model
 
 script_path = os.path.abspath(__file__)
 
@@ -14,7 +15,9 @@ def loadSiameseModel(distance_metric='cosine'):
     input_img1 = tf.keras.layers.Input(shape=input_shape)
     input_img2 = tf.keras.layers.Input(shape=input_shape)
 
-    feature_extractor = loadModel()
+    base_model = loadModel()
+
+    feature_extractor = get_transformed_base_model(base_model)
     # 두 이미지의 특징 벡터 계산
     features_img1 = feature_extractor(input_img1)
     features_img2 = feature_extractor(input_img2)

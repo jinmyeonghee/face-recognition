@@ -7,7 +7,7 @@ project_root = os.path.dirname(current_file_path)
 sys.path.append(project_root)
 
 from utils.face_detector import FacePreparer
-# from utils.face_verifier import Verifier # 특징을 각각 추출하여 함수로 비교
+from utils.face_verifier import Verifier # 특징을 각각 추출하여 함수로 비교
 from utils.face_verifier2 import Verifier2 # 이미지를 둘다 넣고 딥러닝 결과값으로 비교 결과 확인
 from utils.gender_distinguisher import GenderDistinguisher
 from utils.function.generals import load_image
@@ -22,7 +22,7 @@ class FaceDSProject:
         self.model_name = model_name
         self.preparer = FacePreparer(min_detection_confidence)
         # self.verifier = Verifier(self.model_name, distance_metric)
-        self.verifier = Verifier2(self.model_name, distance_metric)
+        self.verifier = Verifier2(self.model_name, distance_metric) #cosine, euclidean, euclidean_l2
         self.distinguisher = GenderDistinguisher()
     
     def get_faces(self, image_path, model_name='vggface'):
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     source3 = '../datasets/_temp/base/201703240905286710_1.jpg'
     
     print('This is sample')
-    print(project.verify(source1, source1))
+    print(project.verify(source1, source2))
     # print(project.distinguish(source1))
     # print(project.distinguish(source2))
     # print(project.distinguish(source3))

@@ -8,7 +8,8 @@ from pathlib import Path
 import gc
 from utils.function.generals import *
 from utils.face_detector import FacePreparer
-
+import tkinter as tk
+from tkinter import filedialog
 
 def get_label_data(df_path, nrows=None):
     """ 이미지 경로 - id - gender 컬럼을 가지는 데이터프레임을 가져온다
@@ -116,4 +117,29 @@ def generator(df, base_path, model_name, generator_batch= 32): #클래스에 대
         
 
 
-                    
+def get_df_from_excel(excel_path = None, image_data_root = None, reverse_gender_value = True):
+    """
+    2 데이터프레임을 엑셀로부터 가져옵니다. id/gender/id_image_data_root 컬럼의 데이터프레임, path컬럼의 데이터프레임을 반환합니다.
+    excel_path는 엑셀파일의 위치를 지정합니다. 지정하지 않았을 경우 팝업창을 띄웁니다.
+    image_data_root는 이미지 데이터의 루트 위치를 지정합니다. 지정하지 않았을 경우 팝업창을 띄웁니다.
+    reverse_gender_value 는 기본값 True고, 역할은 gender 0을 1로, 1을 0으로 가져오는 것입니다.
+
+    """
+    if excel_path is None:
+        excel_path = get_filename_by_gui()
+
+    excel = pd.read_excel((excel_path), sheet_name=None) # None으로 하면 모든 시트를 가져옵니다.
+
+    df_id_label = excel['Sheet'].iloc[:, :2]
+    df_paths = excel['path']
+
+    if reverse_gender_value:
+        df_id_label['gender'] = df_id_label['gender'].apply(lambda x: 1 - x)
+    
+    if image_data_root is None:
+        image_data_root = get_directory_by_gui()
+
+    df_id_label['id_image_data_root'] = df_id_label['ID'].apply(lambda x: os.path.join(image_data_root, str(x)))
+
+    return df_id_label, df_paths
+

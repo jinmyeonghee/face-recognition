@@ -41,7 +41,7 @@ def get_embedding(image_path, model, target_size):
 
 # 이미지 np.ndarray(RGB)로부터 임베딩 벡터를 계산하는 함수
 def fetch_embedding(model, face_image):
-    embedding = model.predict(np.expand_dims(face_image, axis=0)).flatten()
+    embedding = model.predict(np.expand_dims(face_image / 255, axis=0)).flatten()
     # print(embedding)
     return embedding
 
@@ -65,6 +65,4 @@ def get_face_embedding_dict(image_paths, model_name, target_size):
                 embedding_dict[os.path.splitext(file)[0]] = embeddings
        
     return embedding_dict
-
-
 

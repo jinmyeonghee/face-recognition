@@ -1,6 +1,6 @@
 import tensorflow as tf
 import os
-from .VGGFace import loadModel
+from .ArcFace import loadModel
 from utils.math import get_layer
 from utils.function.generals import find_target_size
 
@@ -8,7 +8,7 @@ script_path = os.path.abspath(__file__)
 
 def loadSiameseModel(distance_metric='cosine'):
     # 입력 이미지의 크기 설정 (예: 224x224x3)
-    input_shape = find_target_size('VGGFace') + (3,) # (w, h, 3)
+    input_shape = find_target_size('ArcFace') + (3,) # (w, h, 3)
 
     # 샴 네트워크의 두 입력 이미지 정의
     input_img1 = tf.keras.layers.Input(shape=input_shape)
@@ -34,7 +34,7 @@ def loadSiameseModel(distance_metric='cosine'):
     return siamese_network
     
 def loadWeight(siamese_network, distance_metric='cosine'):
-    WEIGHTS_FILE_NAME = 'vgg_siamese.h5'
+    WEIGHTS_FILE_NAME = 'arcface_siamese.h5'
     
     file_path = os.path.join(script_path, 'weights', WEIGHTS_FILE_NAME)
     

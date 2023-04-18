@@ -28,6 +28,7 @@ def loadModel(
 ):
     weights_dir_name = 'weights'
     file_name = "gender_train_weights7.h5"
+    base_file_name = "gender_model_weights.h5"
     
     url_base="https://github.com/serengil/deepface_models/releases/download/v1.0/gender_model_weights.h5"    # 기존 가중치
     
@@ -53,13 +54,16 @@ def loadModel(
         os.makedirs(weights_dir)
 
     file_path = os.path.join(script_dir, weights_dir, file_name)
+    base_file_path = os.path.join(script_dir, weights_dir, base_file_name)
 
     if os.path.isfile(file_path) != True:
         print("gender_train_weights7.h5 will be downloaded...")
         try:
             gdown.download(url, file_path, quiet=False) 
         except:
-            gdown.download(url_base, file_path, quiet=False) 
+            print("failed to download gender_train_weights7.h5")
+            print("gender_model_weights.h5 will be downloaded...")
+            gdown.download(url_base, base_file_path, quiet=False) 
 
     gender_model.load_weights(file_path)
 

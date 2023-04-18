@@ -18,7 +18,7 @@ def is_numpy_image(array):
     return isinstance(array, np.ndarray) and (array.ndim == 3) and (array.shape[2] in [1, 3, 4])
 
 class FaceDSProject:
-    def __init__(self, min_detection_confidence = 0.2, model_name = 'VGG-Face', distance_metric = 'cosine'):
+    def __init__(self, min_detection_confidence = 0.2, model_name = 'VGG-Face', distance_metric = 'euclidean'):
         self.model_name = model_name
         self.preparer = FacePreparer(min_detection_confidence)
         # self.verifier = Verifier(self.model_name, distance_metric)
@@ -40,7 +40,7 @@ class FaceDSProject:
         #         np.savetxt(outfile, row, fmt="%d", delimiter=",")
         return self.preparer.detect_faces(image, model_name)
 
-    def verify(self, origin_image_path, target_image_path, threshold=0.5):
+    def verify(self, origin_image_path, target_image_path, threshold=0.6):
         """
         verify한 결과 반환
         image_path : 이미지 url, 이미지 시스템 경로, 이미지 RGB np.ndarray 세 형식으로 받습니다.
@@ -57,6 +57,8 @@ class FaceDSProject:
     
     def distinguish(self, image_path):
         face_list = self.get_faces(image_path, 'gender')
+        if face_list is None:
+            return {'result_message' : '원본 이미지를 읽어올 수 없습니다.', 'result_code' : -11 }
         return self.distinguisher.predict_gender(face_list)
 
     
@@ -64,7 +66,7 @@ if __name__ == '__main__':
     # min_detection_confidence => detecting 임계값(0 ~ 1)
     # model_name => vggface/vgg-face, facenet512 (모델은 대소문자 구분 없음)
     # distance_metric => cosine, euclidean, euclidean_l2
-    project = FaceDSProject(model_name='vggface', distance_metric='cosine')
+    project = FaceDSProject(model_name='vggface', distance_metric='euclidean')
 
     source1 = '../datasets/High_Resolution/19062421/S001/L1/E01/C6.jpg'
     source2 = '../datasets/High_Resolution/19062421/S001/L1/E01/C7.jpg'

@@ -1,4 +1,4 @@
-import os
+import os, gdown
 from pathlib import Path
 import tensorflow as tf
 
@@ -38,8 +38,13 @@ else:
     )
 # --------------------------------
 
+    script_dir = os.path.dirname(os.path.abspath(__file__))
 
 def loadModel():
+    url="https://github.com/serengil/deepface_models/releases/download/v1.0/arcface_weights.h5"
+    weights_dir_name = 'weights'
+    weight_file = "arcface_weights.h5"
+    
     base_model = ResNet34()
     inputs = base_model.inputs[0]
     arcface_model = base_model.outputs[0]
@@ -54,12 +59,21 @@ def loadModel():
     )
     model = keras.models.Model(inputs, embedding, name=base_model.name)
 
-    # --------------------------------
 
-    root_path = str(Path.cwd())
-    weight_file = "arcface_weights.h5"
-    model.load_weights(root_path + '/models/basemodels/weights/' + weight_file)
-    print('loading weight from ' + root_path + '/models/basemodels/weights/' + weight_file)
+    weights_dir = os.path.join(script_dir, weights_dir_name)
+    if not os.path.exists(weights_dir):
+        os.makedirs(weights_dir)
+
+    file_path = os.path.join(script_dir, weights_dir_name, weight_file)
+    if os.path.isfile(file_path) != True:
+        print("arcface_weights.h5 will be downloaded...")
+        gdown.download(url, file_path, quiet=False)
+    model.load_weights(file_path)
+
+    # --------------------------------
+    # root_path = str(Path.cwd())
+    # model.load_weights(root_path + '/models/basemodels/weights/' + weight_file)
+    # print('loading weight from ' + root_path + '/models/basemodels/weights/' + weight_file)
 
     return model
 

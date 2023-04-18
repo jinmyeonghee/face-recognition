@@ -1,6 +1,5 @@
 import cv2, mediapipe, os
 from .function.align import alignment_procedure
-from .function.url_to_image import url_to_np_array
 from .function.generals import find_target_size
 
 
@@ -26,7 +25,7 @@ class FacePreparer:
     def detect_faces(self, image, model_name='vggface', align=True):
         """
         RGB이미지 형식의 np.ndarray로 받은 후 얼굴을 찾고, 얼굴 수만큼 크롭, 정렬, 패딩 추가,리사이즈해서
-        리스트로 반환함
+        리스트로 반환함. 각 요소는 (0 ~ 255)값
         예) 3인의 얼굴이 발견된 경우, [이미지np.ndarray1, 이미지np.ndarray2, 이미지np.ndarray3]
         """
         results = self.detector.process(image)  

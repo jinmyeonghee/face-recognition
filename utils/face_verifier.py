@@ -27,11 +27,7 @@ class Verifier:
         return calculate_distance(origin_embedding, target_embedding, self.model_name, self.distance_metric)
 
     
-    def verify(self, origin_face_list, target_face_list):
-        # print(origin_face_list)
-        # print(len(origin_face_list))
-        # print(target_face_list)
-        # print(len(target_face_list))
+    def verify(self, origin_face_list, target_face_list, threshold= 0.5):
         if len(origin_face_list) == 0:
             
             return {'result_message' : '원본 이미지에서 얼굴이 검출되지 않았습니다.', 'result_code' : -2 }
@@ -39,15 +35,20 @@ class Verifier:
             return {'result_message' : '비교할 이미지에서 얼굴이 검출되지 않았습니다.', 'result_code' : -1 }
         
         # 각각 verify_each 함수를 돌린 결과값을 result로 뽑고 list모양인 dict값에 append한다.
-        face_dict_list = []
+        face_2dlist = []
+        result_code = 0
+        result_message = '동일인이 존재하지 않습니다.'
         for i, o_face in enumerate(origin_face_list):
-            face_dict = {f"{i+1}번째 얼굴" : []}
+            face_list = []
             for j, t_face in enumerate(target_face_list):
                 result = self.verify_each(o_face, t_face)
-                face_dict[f"{i+1}번째 얼굴"].append(result)
-            face_dict_list.append(face_dict)
+                if result[0][0] > threshold:
+                    result_code = 2
+                    result_message = '동일인이 존재합니다.'
+                face_list.append(result[0][0])
+            face_2dlist.append(face_list)
         
-        return face_dict_list
+        return {'result_message': result_message, 'result_code': result_code, 'result_list': face_2dlist} 
 
 
 

@@ -31,6 +31,8 @@ class FaceDSProject:
         model 인풋사이즈에 맞게 전처리된 얼굴 이미지 numpy배열 리스트 추출 반환
         """
         image = load_image(image_path, project_root)
+        if image is None or len(image) == 0:
+            return None
        
         # np.ndarray에 어떤식으로 들어가는지 확인용.
         # with open(f"image_array{idx}.txt", "w") as outfile:
@@ -46,6 +48,10 @@ class FaceDSProject:
         """
         face_list1 = self.get_faces(origin_image_path, self.model_name)
         face_list2 = self.get_faces(target_image_path, self.model_name)
+        if face_list1 is None:
+            return {'result_message' : '원본 이미지를 읽어올 수 없습니다.', 'result_code' : -22 }
+        if face_list2 is None:
+            return {'result_message' : '대상 이미지를 읽어올 수 없습니다.', 'result_code' : -21 }
 
         return self.verifier.verify(face_list1, face_list2, threshold)
     

@@ -70,9 +70,15 @@ def load_image(img, project_root = ''):
 
     # The image is a url
     if img.lower().startswith("http://") or img.lower().startswith("https://"):
-        return np.array(Image.open(requests.get(img, stream=True, timeout=60).raw).convert("RGB"))[
+        opened_image = []
+        try:
+            opened_image = Image.open(requests.get(img, stream=True, timeout=60).raw)
+        except:
+            return []
+        img_array = np.array(opened_image.convert("RGB"))[
             :, :, ::-1
         ]
+        return img_array
     
     # The image is a path
     img = os.path.join(project_root, img)

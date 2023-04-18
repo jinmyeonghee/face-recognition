@@ -1,4 +1,5 @@
 # pip install -q h5py pyyaml    # 체크포인트 사용 위해 설치 필요
+## 대용량 데이터인 관계로 분할하여 학습 진행 - train_gender1.py ~ train_gender42.py (총 1,680,000개의 데이터)
 
 import tensorflow as tf
 

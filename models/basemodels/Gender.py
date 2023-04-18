@@ -24,11 +24,12 @@ labels = ["Woman", "Man"]
 
 
 def loadModel(
-    url="https://github.com/serengil/deepface_models/releases/download/v1.0/gender_model_weights.h5",
+    url="https://dl.dropboxusercontent.com/s/j99xq4vgyt4xt09/gender_train_weights7.h5",     # 새로 학습시킨 가중치
 ):
     weights_dir_name = 'weights'
-    file_name = "gender_model_weights.h5"
+    file_name = "gender_train_weights7.h5"
     
+    url_base="https://github.com/serengil/deepface_models/releases/download/v1.0/gender_model_weights.h5"    # 기존 가중치
     
     model = VGGFace.baseModel()
 
@@ -54,9 +55,11 @@ def loadModel(
     file_path = os.path.join(script_dir, weights_dir, file_name)
 
     if os.path.isfile(file_path) != True:
-        print("gender_model_weights.h5 will be downloaded...")
-
-        gdown.download(url, file_path, quiet=False)
+        print("gender_train_weights7.h5 will be downloaded...")
+        try:
+            gdown.download(url, file_path, quiet=False) 
+        except:
+            gdown.download(url_base, file_path, quiet=False) 
 
     gender_model.load_weights(file_path)
 

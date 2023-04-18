@@ -6,7 +6,8 @@ from pathlib import Path
 from PIL import Image
 import cv2
 import requests
-
+import tkinter as tk
+from tkinter import filedialog
 
 def set_seeds(SEED=42):
   os.environ['PYTHONHASHSEED'] = str(SEED)
@@ -51,9 +52,9 @@ def find_target_size(model_name):
 # --------------------------------------------------
 
 
-def load_image(img, project_root):
+def load_image(img, project_root = ''):
     """Load image from path, url, numpy array.
-
+    project_root 기본값 ''
     Args:
         img: a path, url, numpy array(RGB).
 
@@ -79,9 +80,10 @@ def load_image(img, project_root):
     if os.path.isfile(img) is not True:
         raise ValueError(f"Confirm that {img} exists")
     
+    img_path = img
     img = cv2.imread(img)
     if img is None:
-        img = imread_korean(img)
+        img = imread_korean(img_path)
     rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     return rgb_img
 # --------------------------------------------------
@@ -90,3 +92,32 @@ def imread_korean(file_path):
     img_array = np.fromfile(file_path, np.uint8)
     img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
     return img
+
+def get_tk_hidden_object():
+    root = tk.Tk()
+    root.wm_attributes('-topmost', True)
+    root.withdraw()
+
+    return root
+
+def get_directory_by_gui(title='이미지 데이터 폴더를 선택하세요'):
+    root = get_tk_hidden_object()
+
+    # 파일 업로드 대화상자를 열고 선택한 파일의 경로를 가져옵니다.
+    image_data_path = filedialog.askdirectory(title=title)
+    
+    # 대화상자가 닫힌 후 root 객체를 파괴합니다.
+    root.destroy()
+
+    return image_data_path
+
+def get_filename_by_gui(title='엑셀 파일(AI_Hub_gender_with_path_sheet.xlsx)을 선택하세요'):
+    root = get_tk_hidden_object()
+
+    # 파일 업로드 대화상자를 열고 선택한 파일의 경로를 가져옵니다.
+    file_path = filedialog.askopenfilename(title=title)
+    
+    # 대화상자가 닫힌 후 root 객체를 파괴합니다.
+    root.destroy()
+
+    return file_path

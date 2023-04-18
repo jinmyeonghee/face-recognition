@@ -38,7 +38,7 @@ class FaceDSProject:
         #         np.savetxt(outfile, row, fmt="%d", delimiter=",")
         return self.preparer.detect_faces(image, model_name)
 
-    def verify(self, origin_image_path, target_image_path):
+    def verify(self, origin_image_path, target_image_path, threshold=0.5):
         """
         verify한 결과 반환
         image_path : 이미지 url, 이미지 시스템 경로, 이미지 RGB np.ndarray 세 형식으로 받습니다.
@@ -47,7 +47,7 @@ class FaceDSProject:
         face_list1 = self.get_faces(origin_image_path, self.model_name)
         face_list2 = self.get_faces(target_image_path, self.model_name)
 
-        return self.verifier.verify(face_list1, face_list2)
+        return self.verifier.verify(face_list1, face_list2, threshold)
     
     def distinguish(self, image_path):
         face_list = self.get_faces(image_path, 'gender')

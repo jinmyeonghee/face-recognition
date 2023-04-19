@@ -54,7 +54,7 @@ class Verifier2:
                 face_list.append(result[0][0])
             face_2dlist.append(face_list)
         
-        return {'result_message': result_message, 'result_code': result_code, 'result_list': face_2dlist} 
+        return {'result_message': result_message, 'result_code': result_code, 'result_list': face_2dlist, 'origin' : origin_face_list, 'target' : target_face_list} 
 
 
 

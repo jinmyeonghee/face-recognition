@@ -107,12 +107,7 @@ def calculate_distance(origin_embedding, target_embedding, model_name, distance_
         
         threshold = findThreshold(model_name, distance_metric)
         # print(threshold)
-        if threshold > distance:
-            return { "임계값": threshold, "두 얼굴의 유사도": round(distance, 2), "일치 여부" : True }
-            #return True
-        else:
-            return { "임계값": threshold, "두 얼굴의 유사도": round(distance, 2), "일치 여부" : False }
-            #return False
+        return round(distance, 2), distance < threshold
 
     else:
        return ('두 이미지에서 얼굴을 찾을 수 없습니다.', False)

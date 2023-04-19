@@ -28,6 +28,9 @@ class Verifier:
 
     
     def verify(self, origin_face_list, target_face_list, threshold= 0.5):
+        """
+        해당 메소드는 자체 threshold를 사용합니다.
+        """
         if len(origin_face_list) == 0:
             
             return {'result_message' : '원본 이미지에서 얼굴이 검출되지 않았습니다.', 'result_code' : -2 }
@@ -41,11 +44,11 @@ class Verifier:
         for i, o_face in enumerate(origin_face_list):
             face_list = []
             for j, t_face in enumerate(target_face_list):
-                result = self.verify_each(o_face, t_face)
-                if result[0][0] > threshold:
+                similarity, result = self.verify_each(o_face, t_face)
+                if result:
                     result_code = 2
                     result_message = '동일인이 존재합니다.'
-                face_list.append(result[0][0])
+                face_list.append(similarity)
             face_2dlist.append(face_list)
         
         return {'result_message': result_message, 'result_code': result_code, 'result_list': face_2dlist} 

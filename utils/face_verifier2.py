@@ -32,7 +32,7 @@ class Verifier2:
 
 
     
-    def verify(self, origin_face_list, target_face_list, threshold= 0.5):
+    def verify(self, origin_face_list, target_face_list, threshold = 0.5):
         
         if len(origin_face_list) == 0:
             

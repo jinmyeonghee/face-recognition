@@ -29,7 +29,7 @@
         # 이미지에서 얼굴을 찾아서 크롭하고, 정렬하고, 패딩을 추가하고, 사이즈를 224X224로 변경해서 가져온다.
         face_list = project.get_faces(image_path1) # 통상적으로 이 메소드를 부를 일은 없습니다.
         
-        verification_results = project.verify(image_path2, image_path3, threshold = 0.5)
+        verification_results = project.verify(image_path2, image_path3, threshold = 0.664)
         print(verification_results)
         # print(verification_results) 원본 이미지 6인 X 대상 이미지 6인 결과 예시
         # 성공

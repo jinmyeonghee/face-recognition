@@ -1,6 +1,7 @@
 import os, sys
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 current_file_path = os.path.abspath(__file__)
 project_root = os.path.dirname(current_file_path)
@@ -13,6 +14,7 @@ from utils.gender_distinguisher import GenderDistinguisher
 from utils.function.generals import load_image
 
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+plt.rcParams['font.family'] = 'Malgun Gothic'
 
 def is_numpy_image(array):
     return isinstance(array, np.ndarray) and (array.ndim == 3) and (array.shape[2] in [1, 3, 4])
@@ -61,6 +63,62 @@ class FaceDSProject:
             return {'result_message' : '원본 이미지를 읽어올 수 없습니다.', 'result_code' : -11 }
         return self.distinguisher.predict_gender(face_list)
 
+def plot_pairs(img1, img2, img3, img4, result):
+    # 첫번째 이미지
+    plt.subplot(2, 2, 1)
+    plt.imshow(img1)
+    plt.title('Origin')
+
+    # 두번째 이미지
+    plt.subplot(2, 2, 2)
+    plt.imshow(img2)
+    plt.title('Target')
+    
+    # 첫번째 이미지
+    plt.subplot(2, 2, 3)
+    plt.imshow(img3)
+    plt.title('Origin_cropped')
+
+    # 두번째 이미지
+    plt.subplot(2, 2, 4)
+    plt.imshow(img4)
+    plt.title('Target_cropped')
+
+    # subplot 간격 조절
+    plt.subplots_adjust(hspace=0.4)
+
+    plt.suptitle(result['result_message'])
+
+    # 이미지 플롯 보여주기
+    plt.show()
+    # input('Press Enter to continue...')
+
+def plot_genders(img1, img2, result1, img3, img4, result2):
+    # 첫번째 이미지
+    plt.subplot(2, 2, 1)
+    plt.imshow(img1)
+    plt.title((result1['result_list'][0]['dominant_gender']))
+
+    # 두번째 이미지
+    plt.subplot(2, 2, 2)
+    plt.imshow(img2)
+    plt.title((result1['result_list'][0]['dominant_gender'] + ' cropped'))
+    
+    # 첫번째 이미지
+    plt.subplot(2, 2, 3)
+    plt.imshow(img3)
+    plt.title((result2['result_list'][0]['dominant_gender']))
+
+    # 두번째 이미지
+    plt.subplot(2, 2, 4)
+    plt.imshow(img4)
+    plt.title((result2['result_list'][0]['dominant_gender'] + ' cropped'))
+
+    # subplot 간격 조절
+    plt.subplots_adjust(hspace=0.4)
+
+    # 이미지 플롯 보여주기
+    plt.show()
     
 if __name__ == '__main__':
     # min_detection_confidence => detecting 임계값(0 ~ 1)
@@ -72,14 +130,30 @@ if __name__ == '__main__':
     source2 = '../datasets/High_Resolution/19062421/S001/L1/E01/C7.jpg'
     source3 = '../datasets/_temp/base/201703240905286710_1.jpg'
     
-    print('This is sample')
-    print(project.verify(source1, source2))
-    # print(project.distinguish(source1))
-    # print(project.distinguish(source2))
-    # print(project.distinguish(source3))
+    img00 = 'sample_data/s3.jpg'
+    img01 = 'sample_data/s3_2.jpg'
+    img10 = 'sample_data/s2.jpg'
 
-    url1 = 'https://m.media-amazon.com/images/I/71ZMw9YqEJL._SL1500_.jpg'
-    url2 = 'https://m.media-amazon.com/images/I/71bnIcDHk6L._SL1500_.jpg'
-    # url2 = '../datasets/_temp/base/bts01.jpg'
+    img_m = 'sample_data/s8.jpg'
+    img_w = 'sample_data/s1.jpg'
+
+    print('This is sample')
+
+    result1 = project.verify(img00, img01)
+    print('결과 메세지 : ', result1['result_message'], ' 결과 값 : ', result1['result_code'])
+    print('유사도 : ', result1['result_list'])
+    plot_pairs(load_image(img00, project_root), load_image(img01, project_root), project.get_faces(img00)[0], project.get_faces(img01)[0], result1)
     
-    print(project.verify(url1, url1))
+    result2 = project.verify(img00, img10)
+    print('결과 메세지 : ', result2['result_message'], ' 결과 값 : ', result2['result_code'])
+    print('유사도 : ', result2['result_list'])
+    plot_pairs(load_image(img00, project_root), load_image(img10, project_root), project.get_faces(img00)[0], project.get_faces(img10)[0], result2)
+    
+    result_m = project.distinguish(img_m)
+    result_w = project.distinguish(img_w)
+    plot_genders(load_image(img_m, project_root), project.get_faces(img_m)[0], result_m, load_image(img_w, project_root), project.get_faces(img_w)[0], result_w)
+
+    # url1 = 'https://m.media-amazon.com/images/I/71ZMw9YqEJL._SL1500_.jpg'
+    # url2 = 'https://m.media-amazon.com/images/I/71bnIcDHk6L._SL1500_.jpg'
+    
+    # print(project.verify(url1, url1))

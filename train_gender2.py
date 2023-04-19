@@ -29,6 +29,14 @@ import pandas as pd
 import os
 import openpyxl
 
+import numpy as np
+from utils.face_detector import FacePreparer
+from utils.function.generals import load_image
+
+from sklearn.model_selection import train_test_split
+
+
+
 n = 1               # 수정 -> (n = 파일명 번호 - 1)
 init = 100 * n
 start = init + 1    
@@ -53,7 +61,7 @@ def get_label_data(excel_path, img_path):
     df_id0_label = excel['Sheet'].iloc[:, :2].astype('int')
     df_id_label = excel['Sheet'].iloc[:, :2].astype('int')
     df_id0_label['realpath'] = df_id0_label['ID'].apply(lambda x: os.path.join(img_path, str(x), df_path['path'][init]))
-    for i in range(start, end):    # 400*100 = 40,000개 path 생성 - 마지막은 해당되는 만큼
+    for i in range(start, end):    # 400*100 = 40,000개 path 생성
         df_id_label['realpath'] = df_id0_label['ID'].apply(lambda x: os.path.join(img_path, str(x), df_path['path'][i]))
         if i == start:
             df_id = pd.concat([df_id0_label, df_id_label], ignore_index=True)
@@ -72,11 +80,6 @@ def get_label_data(excel_path, img_path):
 df = get_label_data(excel_path, img_base_path)
 
 print("load excel")
-
-
-import numpy as np
-from utils.face_detector import FacePreparer
-from utils.function.generals import load_image
 
 
 ## datset - df[realpath(img_array), gender]
@@ -114,19 +117,6 @@ def gen():
 
 df_train_raw = tf.data.Dataset.from_generator(gen, output_types=(tf.float64, tf.int16))
 
-# X_train_raw = df['realpath'].apply(nparray_set_maker)
-# df_train_raw = pd.concat([X_train_raw, df['Gender']], axis=1)   # realpath(img_array), Gender col
-# print(df_train_raw)
-# print("------------------------")
-# # X_train_raw로부터 복사본을 만들고, 인덱스 2번을 np.nan으로 변경(얼굴 추출 실패 상황 가정)
-# df_train_example = df_train_raw.copy()
-# df_train_example['realpath'][2] = np.nan
-# # print(df_train_example)
-# # print("------------------------")
-# # dropna 메소드를 통해 정상적으로 드롭되는지 확인합니다.
-# df_train_dropped = df_train_example.dropna()
-# print(df_train_dropped)
-# print("------------------------")
 print("load image from path & resize images")
 
 # 데이터 크기가 너무 배치 단위로 나눠줌
@@ -136,11 +126,9 @@ for batch, (x,y) in enumerate(df_train_batch):
     pass
 
 ## Split Train/Val/Test set
-from sklearn.model_selection import train_test_split
-
-# data = np.stack(df_train_dropped['realpath'])   # data (144000-dropna, 224, 224, 3)
-data = np.array(x)        # (100, 224, 224, 3)     # batch_size: 100
-target = np.array(y)      # label (100,)           # batch_size: 100
+# data = np.stack(df_train_dropped['realpath'])   # data (144000-drop, 224, 224, 3)
+data = np.array(x)        # (1000, 224, 224, 3)     # batch_size: 1000
+target = np.array(y)      # label (1000,)           # batch_size: 1000
 
 print('data.shape :', data.shape, ' target.shape :', target.shape)
 
@@ -159,6 +147,9 @@ print("prepare time(sec): ", round(end_time - strat_time,1))
 ## Model
 from utils.gender_distinguisher import GenderDistinguisher
 import tensorflow as tf
+from tensorflow.keras.callbacks import EarlyStopping
+
+import matplotlib.pyplot as plt
 
 model = GenderDistinguisher().model
 
@@ -166,14 +157,6 @@ print("load model")
 
 
 ## 모델 학습 - transfer learning fine tuning을 통한 AI_Hub 데이터 학습
-# 체크포인트 콜백 사용 - 가중치 중간 저장
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-
-# checkpoint_path = './models/weights/gender_training/train1/checkpoint1--{epoch:04d}.ckpt'   # .ckpt - 모델 제외 학습 가중치만 있는 파일
-# checkpoint_dir = os.path.dirname(checkpoint_path)
-
-# cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, save_best_only=True, save_weights_only=True, verbose=1, period=5) # save_best_only: 최상의 모델만 저장 / period: 1 epoch마다 가중치 저장 
-
 # 컴파일 후, 학습 진행
 model.compile(optimizer = tf.keras.optimizers.Adam(learning_rate= 0.0001),
                   loss = 'sparse_categorical_crossentropy',        # activation: softmax
@@ -186,8 +169,6 @@ print("n epochs model fit time(sec): ", round(end_time - strat_time,1))
 print("Complete train model")
 
 # 학습 과정 시각화
-import matplotlib.pyplot as plt
-
 fig, loss_ax = plt.subplots()
 acc_ax = loss_ax.twinx()
 

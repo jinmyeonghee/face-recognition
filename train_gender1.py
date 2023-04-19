@@ -30,6 +30,12 @@ import pandas as pd
 import os
 import openpyxl
 
+import numpy as np
+from utils.face_detector import FacePreparer
+from utils.function.generals import load_image
+
+from sklearn.model_selection import train_test_split
+
 
 
 strat_time = time.time()
@@ -71,11 +77,6 @@ df = get_label_data(excel_path, img_base_path)
 print("load excel")
 
 
-import numpy as np
-from utils.face_detector import FacePreparer
-from utils.function.generals import load_image
-
-
 ## datset - df[realpath(img_array), gender]
 model_name = 'vggface'
 preparer = FacePreparer()
@@ -114,18 +115,16 @@ df_train_raw = tf.data.Dataset.from_generator(gen, output_types=(tf.float64, tf.
 print("load image from path & resize images")
 
 
-# 데이터 크기가 너무 배치 단위로 나눠줌
+# 데이터 크기가 너무 큰 관계로 배치 단위로 나눠줌
 df_train_batch = df_train_raw.batch(1000)
 
 for batch, (x,y) in enumerate(df_train_batch):
     pass
 
 ## Split Train/Val/Test set
-from sklearn.model_selection import train_test_split
-
-# data = np.stack(df_train_dropped['realpath'])   # data (144000-dropna, 224, 224, 3)
-data = np.array(x)        # (100, 224, 224, 3)     # batch_size: 100
-target = np.array(y)      # label (100,)           # batch_size: 100
+# data = np.stack(df_train_dropped['realpath'])   # data (144000-drop, 224, 224, 3)
+data = np.array(x)        # (1000, 224, 224, 3)     # batch_size: 1000
+target = np.array(y)      # label (1000,)           # batch_size: 1000
 
 print('data.shape :', data.shape, ' target.shape :', target.shape)
 

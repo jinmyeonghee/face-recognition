@@ -3,7 +3,7 @@
 
 **사용 언어 : python**
 
-**개발환경 : macOS Ventura 13.1, visual studio code**
+**개발환경 : macOS Ventura 13.3, visual studio code**
 
 **사용 라이브러리 : MediaPipe, OpenCV**
 

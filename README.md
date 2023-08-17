@@ -23,7 +23,7 @@
 <img width="824" alt="스크린샷 2023-08-16 오전 11 00 32" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/1dfdaa2a-a251-4f5f-817d-f62688864464">  
 - 두 개의 이미지를 전처리 진행한 후 벡터를 추출. 두 벡터의 거리계산을 통해 동일인인지 판단  
 
-  
+
 **프로젝트 수행절차와 개발인원들의 역할 분담**
 <img width="815" alt="스크린샷 2023-08-16 오전 11 00 57" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/4d3a44aa-3e5b-41b1-8614-d16430cf17eb">
 

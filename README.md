@@ -18,17 +18,45 @@
 ### 프로젝트 배경
 - 소개팅어플을 이용한 온라인만남을 악용할 가능성이 있어 본인인증이 매우 중요 
 
-   
 ## 프로젝트 내용
 ### 1. 프로젝트 모델 선정과 프로젝트 구조
-<img width="824" alt="스크린샷 2023-08-16 오전 11 00 32" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/1dfdaa2a-a251-4f5f-817d-f62688864464">
+<img width="824" alt="스크린샷 2023-08-16 오전 11 00 32" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/1dfdaa2a-a251-4f5f-817d-f62688864464">  
 - 두 개의 이미지를 전처리 진행한 후 벡터를 추출. 두 벡터의 거리계산을 통해 동일인인지 판단  
 
+  
 **프로젝트 수행절차와 개발인원들의 역할 분담**
 <img width="815" alt="스크린샷 2023-08-16 오전 11 00 57" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/4d3a44aa-3e5b-41b1-8614-d16430cf17eb">
 
 ### 2. 프로젝트 수행 - 모델 구축 및 개선
 <img width="940" alt="스크린샷 2023-08-16 오전 11 27 55" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/d85d224d-3ca4-46b6-b946-c0a8eabc8e6b">
+
+**내가 진행한 부분**
+1) 얼굴특징 벡터 추출  
+  get_embedding.py  
+  이미지파일을 numpy배열로 변환 후 이미지(RGB)로부터 임베딩 벡터 계산
+  
+2) 유사도판단 코드 구현
+  get_similarity.py
+  얼굴이미지의 두 벡터의 거리를 측정하여 유사도를 계산하고, 유사한 이미지인지 판단.
+  벡터 비교방법은 코사인 거리, 유클리디안 거리, 유클리디안 L2 거리 3가지
+  임계값은 얼굴 인식 모델마다 다름. 베이스모델에 대한 임계값은 아래와 같음.
+<img width="624" alt="스크린샷 2023-08-17 오후 10 57 00" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/a9f3eefc-ef10-4783-aa5a-93ec01d6368a">
+  우리는 베이스모델에 학습을 하기 때문에 모델에 맞는 적당한 임계값을 찾는 것이 중요함.
+  통계적 접근방식으로 임계값을 찾은 다음 여러번 조정해가며 두 클래스를 구분하는 적절한 값을 찾으면 됨.  
+  예시) 아래의 이미지는 두 개의 이미지쌍의 벡터거리를 나타낸 그래프(동일인 파랑, 비동일인 주황)
+<img width="681" alt="스크린샷 2023-08-17 오후 11 04 08" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/08c1ec2c-c9ea-409f-be55-28ec73616471">  
+   - 0.3524과 0.4654사이에는 두 클래스가 모두 있음. 그 사이 적절한 임계값을 찾으면 됨.
+
+4) Facenet512학습 및 성능 추출
+CS_AI16_Facenet512.py
+베이스모델인 Facenet512에 학습데이터를 이용하여 학습시킴.
+벡터 비교방법은 코사인거리로 설정.
+샴네트워크에 들어갈 두 이미지를 정의하고 특징벡터 계산. 거리계산레이어와 유사성 점수 출력을 위한 시그모이드 활성화 함수를 사용하는 완전연결 레이어.
+최종 샴 네트워크 모델 정의.
+
+
+
+
 
 ### 3. 프로젝트 수행 결과
 <img width="963" alt="스크린샷 2023-08-16 오전 11 28 25" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/f8634674-b44a-42be-97d5-8b19f478c712">

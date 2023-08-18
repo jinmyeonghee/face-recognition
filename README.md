@@ -50,8 +50,10 @@
   
   - 시그마가 1일 때
 <img width="353" alt="스크린샷 2023-08-18 오후 3 50 05" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/fb2969b8-4c99-42f6-a20d-4db00baddd30">
+
   - 시그마가 2일 때
 <img width="356" alt="스크린샷 2023-08-18 오후 3 50 29" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/97add16a-4897-4af3-a021-c2381d988862">
+
   -> 0.664와 0.778 사이 적절한 임계값을 정함. 우리는 0.685로 지정.
 
 

@@ -43,11 +43,16 @@
   <img width="624" alt="스크린샷 2023-08-17 오후 10 57 00" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/a9f3eefc-ef10-4783-aa5a-93ec01d6368a">
   
   - 우리는 베이스모델에 학습을 하기 때문에 모델에 맞는 적당한 임계값을 찾는 것이 중요함.    
-  - 통계적 접근방식으로 임계값을 찾은 다음 여러번 조정해가며 두 클래스를 구분하는 적절한 값을 찾으면 됨.      
-  예시) 아래의 이미지는 두 개의 이미지쌍의 벡터거리를 나타낸 그래프(동일인 파랑, 비동일인 주황)    
-  <img width="681" alt="스크린샷 2023-08-17 오후 11 04 08" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/08c1ec2c-c9ea-409f-be55-28ec73616471">
+  - 통계적 접근방식으로 임계값을 찾은 다음 여러번 조정해가며 두 클래스를 구분하는 적절한 값을 찾으면 됨.
+  - 아래의 이미지는 두 개의 이미지쌍의 벡터거리를 나타낸 그래프(동일인 파랑, 비동일인 주황)    
+  <img width="675" alt="스크린샷 2023-08-18 오후 3 49 26" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/62e5e96d-2bf7-40d3-90e1-c34da2eabe48">
+
   
-  - 0.3524와 0.4654사이에는 두 클래스가 모두 있음. 그 사이 적절한 임계값을 찾으면 됨.
+  - 시그마가 1일 때
+<img width="353" alt="스크린샷 2023-08-18 오후 3 50 05" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/fb2969b8-4c99-42f6-a20d-4db00baddd30">
+  - 시그마가 2일 때
+<img width="356" alt="스크린샷 2023-08-18 오후 3 50 29" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/97add16a-4897-4af3-a021-c2381d988862">
+  -> 0.664와 0.778 사이 적절한 임계값을 정함. 우리는 0.685로 지정.
 
 
 3) Facenet512학습 및 성능 추출 (CS_AI16_Facenet512.py)  

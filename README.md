@@ -66,7 +66,9 @@
 
 
 ### 3. 프로젝트 수행 결과
-<img width="963" alt="스크린샷 2023-08-16 오전 11 28 25" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/f8634674-b44a-42be-97d5-8b19f478c712">
+*기업데이터는 유출금지인 관계로 예시이미지*
+<img width="1378" alt="스크린샷 2023-09-01 오후 8 13 27" src="https://github.com/jinmyeonghee/face-recognition/assets/114460314/e66e7bd4-e07e-463b-8202-ab1305c303b6">
+
 
 
 ### 프로젝트 평가
